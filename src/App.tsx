@@ -1,18 +1,16 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 
-import Home from "./pages/Home"
+import Dashboard from "./pages/Dashboard"
 import MapPage from "./pages/MapPage"
 import ReportPage from "./pages/ReportPage"
-import Dashboard from "./pages/Dashboard"
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Dashboard />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/report" element={<ReportPage />} />
-        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </BrowserRouter>
   )
