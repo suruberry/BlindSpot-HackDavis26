@@ -1,3 +1,4 @@
+import Navbar from "../components/Navbar"
 import { Link } from "react-router-dom"
 import { AlertTriangle, Bike, Clock3, MapPin } from "lucide-react"
 import { mockReports } from "../data/mockReports"
@@ -8,7 +9,7 @@ export default function Dashboard() {
   )
 
   return (
-    <div className="min-h-screen bg-black p-6 text-white">
+    <div className="min-h-screen pb-24 bg-black p-6 text-white">
       <div className="mx-auto max-w-6xl">
 
         <div className="mb-8">
@@ -126,6 +127,7 @@ export default function Dashboard() {
         </div>
 
       </div>
+      <Navbar />
     </div>
   )
 }

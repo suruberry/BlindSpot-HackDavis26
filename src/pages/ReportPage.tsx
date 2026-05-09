@@ -1,3 +1,4 @@
+import Navbar from "../components/Navbar"
 import { useState } from "react"
 import { AlertTriangle, Bike, Car, Lightbulb, MapPin, Send } from "lucide-react"
 
@@ -22,7 +23,7 @@ export default function ReportPage() {
 
   if (submitted) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-black p-6 text-white">
+      <div className="flex min-h-screen pb-24 items-center justify-center bg-black p-6 text-white">
         <div className="max-w-md rounded-3xl bg-zinc-900 p-8 text-center shadow-xl">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/20">
             <Send className="h-8 w-8" />
@@ -43,7 +44,7 @@ export default function ReportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black p-6 text-white">
+    <div className="min-h-screen pb-24 bg-black p-6 text-white">
       <div className="mx-auto max-w-md">
         <p className="text-sm uppercase tracking-[0.3em] text-orange-400">
           BlindSpot
@@ -87,6 +88,7 @@ export default function ReportPage() {
           Submit report
         </button>
       </div>
+      <Navbar />
     </div>
   )
 }

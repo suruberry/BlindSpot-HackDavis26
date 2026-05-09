@@ -1,3 +1,4 @@
+import Navbar from "../components/Navbar"
 import { Link } from "react-router-dom"
 import {
   MapContainer,
@@ -24,7 +25,7 @@ export default function MapPage() {
       <MapContainer className="h-full w-full">
         <SetView />
 
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <TileLayer url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png" />
         {mockReports.map((report) => (
   <CircleMarker
     key={`heat-${report.id}`}
@@ -48,7 +49,10 @@ export default function MapPage() {
   />
 ))}
         {mockReports.map((report) => (
-          <Marker key={report.id} position={[report.latitude, report.longitude]}>
+          <Marker 
+            key={report.id} 
+            position={[report.latitude, report.longitude]}
+            >
             <Popup>
                 <div className="min-w-[180px]">
                     <h3 className="text-lg font-bold">
@@ -125,6 +129,7 @@ export default function MapPage() {
           ))}
         </div>
       </div>
+      <Navbar />
     </div>
   )
 }
