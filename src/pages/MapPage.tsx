@@ -1,5 +1,12 @@
 import { Link } from "react-router-dom"
-import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet"
+import {
+  MapContainer,
+  Marker,
+  Popup,
+  TileLayer,
+  useMap,
+  CircleMarker,
+} from "react-leaflet"
 import { AlertTriangle, FileWarning, MapPin } from "lucide-react"
 import { mockReports } from "../data/mockReports"
 
@@ -18,17 +25,58 @@ export default function MapPage() {
         <SetView />
 
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
+        {mockReports.map((report) => (
+  <CircleMarker
+    key={`heat-${report.id}`}
+    center={[report.latitude, report.longitude] as [number, number]}
+    pathOptions={{
+      color:
+        report.severity === "High"
+          ? "red"
+          : report.severity === "Medium"
+          ? "orange"
+          : "green",
+      fillColor:
+        report.severity === "High"
+          ? "red"
+          : report.severity === "Medium"
+          ? "orange"
+          : "green",
+      fillOpacity: 0.25,
+      opacity: 0.4,
+    }}
+  />
+))}
         {mockReports.map((report) => (
           <Marker key={report.id} position={[report.latitude, report.longitude]}>
             <Popup>
-              <strong>{report.type}</strong>
-              <br />
-              {report.location}
-              <br />
-              Severity: {report.severity}
-              <br />
-              {report.time}
+                <div className="min-w-[180px]">
+                    <h3 className="text-lg font-bold">
+                        {report.type}
+                    </h3>
+
+                    <p className="mt-1 text-sm text-gray-600">
+                        {report.location}
+                    </p>
+
+                <div className="mt-3 flex items-center justify-between">
+                <span
+                    className={`rounded-full px-3 py-1 text-xs font-bold ${
+                    report.severity === "High"
+                    ? "bg-red-100 text-red-600"
+                    : report.severity === "Medium"
+                    ? "bg-yellow-100 text-yellow-700"
+                    : "bg-green-100 text-green-700"
+                    }`}
+                >
+                    {report.severity}
+                </span>
+
+                <span className="text-xs text-gray-500">
+                    {report.time}
+                </span>
+                </div>
+                </div>
             </Popup>
           </Marker>
         ))}
