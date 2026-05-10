@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import { ClipboardList, Loader2, MapPin, Sparkles } from "lucide-react"
+import { ClipboardList, Loader2, MapPin, Sparkles, Trash2 } from "lucide-react"
 import Navbar from "../components/Navbar"
 import { useAuth } from "../lib/auth"
 import { supabase } from "../lib/supabase"
@@ -17,6 +17,7 @@ export default function MyReportsPage() {
   const [reports, setReports] = useState<Report[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
     const userId = user?.id
@@ -59,12 +60,51 @@ export default function MyReportsPage() {
         },
         (payload) => setReports((prev) => [payload.new as Report, ...prev])
       )
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
+          schema: "public",
+          table: "reports",
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          const deletedId = payload.old.id
+          setReports((prev) => prev.filter((report) => report.id !== deletedId))
+        }
+      )
       .subscribe()
 
     return () => {
       supabase.removeChannel(channel)
     }
   }, [user?.id])
+
+  async function deleteReport(report: Report) {
+    if (!user?.id || deletingId) return
+
+    const confirmed = window.confirm("Delete this report? This removes it from your history and the community map.")
+    if (!confirmed) return
+
+    setDeletingId(report.id)
+    setError("")
+
+    const previousReports = reports
+    setReports((prev) => prev.filter((item) => item.id !== report.id))
+
+    const { error } = await supabase
+      .from("reports")
+      .delete()
+      .eq("id", report.id)
+      .eq("user_id", user.id)
+
+    if (error) {
+      setReports(previousReports)
+      setError(error.message)
+    }
+
+    setDeletingId(null)
+  }
 
   return (
     <div className="app-shell">
@@ -167,9 +207,23 @@ export default function MyReportsPage() {
                     </div>
                   )}
 
-                  <p className="mt-4 text-xs font-semibold text-zinc-400">
-                    {new Date(report.created_at).toLocaleString()}
-                  </p>
+                  <div className="mt-4 flex items-center justify-between gap-3">
+                    <p className="text-xs font-semibold text-zinc-400">
+                      {new Date(report.created_at).toLocaleString()}
+                    </p>
+                    <button
+                      onClick={() => deleteReport(report)}
+                      disabled={deletingId === report.id}
+                      className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold text-red-500 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:text-zinc-400"
+                    >
+                      {deletingId === report.id ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-3.5 w-3.5" />
+                      )}
+                      Delete
+                    </button>
+                  </div>
                 </article>
               ))}
             </section>
