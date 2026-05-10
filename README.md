@@ -2,7 +2,9 @@
 
 > Community-powered cyclist safety intelligence for safer cities.
 
-BlindSpot transforms cyclist near-misses into real-time safety intelligence — helping riders avoid dangerous areas before accidents happen and giving cities actionable data to improve infrastructure where it matters most.
+BlindSpot turns public crash hotspots and cyclist near-misses into real-time safety intelligence — helping riders avoid dangerous areas before accidents happen and giving cities actionable data to improve infrastructure where it matters most.
+
+Cyclist crashes do not happen randomly. They cluster around invisible danger zones. BlindSpot makes those patterns visible before someone gets hurt.
 
 **Live Demo:** https://blindspot-two.vercel.app/
 
@@ -31,23 +33,26 @@ BlindSpot makes reporting frictionless and turns invisible danger into usable pu
 
 BlindSpot is a real-time cyclist safety platform where users can:
 - report near-misses in seconds
-- visualize dangerous intersections on a live map
+- visualize public crash hotspots and community reports on a live map
 - discover safer routes
 - help cities identify infrastructure problems before crashes happen
 
-Using AI-powered analysis and community reports, BlindSpot creates a live safety layer for cities.
+Using public Davis safety data, AI-powered analysis, and community reports, BlindSpot creates a live safety layer for cities.
 
 ---
 
 # Features
 
 ## 🗺️ Live Safety Map
-Interactive map displaying community-reported danger zones across Davis.
+Interactive map displaying public crash hotspots and community-reported danger zones across Davis.
 
 - Real-time incident updates
 - Severity-based risk markers
-- Smart incident clustering
+- Source labels for public data vs community reports
+- Severity radius circles for heatmap-like risk zones
 - Mobile-first responsive UI
+
+The public hotspot layer is based on the City of Davis 2023 Local Road Safety Plan, which uses SWITRS collision data for Davis local streets.
 
 ---
 
@@ -86,13 +91,16 @@ Cyclists can:
 ---
 
 ## 📊 Community Insights Dashboard
-Visual dashboard built from collected cyclist safety research and reporting trends.
+Visual dashboard built from public Davis safety data, initial cyclist survey results, and live reporting trends.
 
 Highlights:
+- public crash hotspots
 - near-miss frequency
 - dangerous infrastructure patterns
 - reporting behavior
 - common incident types
+
+In our initial Davis cyclist survey, 78% of respondents said they would not report a near-miss to police or the city.
 
 ---
 
@@ -106,6 +114,7 @@ Highlights:
 | Database | Supabase PostgreSQL |
 | Realtime | Supabase Realtime |
 | AI | Claude via Supabase Edge Functions |
+| Public Data | City of Davis LRSP + SWITRS collision summaries |
 | Deployment | Vercel |
 
 ---
@@ -124,7 +133,24 @@ Claude AI Classification
 Supabase PostgreSQL
     ↓
 Realtime Map Updates
+
+Public Davis LRSP/SWITRS Hotspots
+    ↓
+Real Incident Dataset
+    ↓
+Map + Dashboard + AI Planner Context
 ````
+
+---
+
+# Data Sources
+
+- City of Davis Local Road Safety Plan Executive Summary, 2023
+- California Statewide Integrated Traffic Records System (SWITRS), as summarized in the Davis LRSP
+- BlindSpot live community near-miss submissions
+- Initial Davis cyclist survey responses collected for HackDavis 2026
+
+The Davis LRSP notes that SWITRS captures police-reported injury and fatal collisions, not near-miss events. BlindSpot is designed to fill that missing near-miss layer.
 
 ---
 

@@ -71,7 +71,7 @@ export default function InsightsPage() {
           Community Insights
         </h1>
         <p className="mt-3 text-gray-400">
-          Real survey data from {responses} Davis cyclists collected May 2026.
+          Initial Davis cyclist survey insights from {responses} respondents, collected May 2026.
         </p>
 
         {/* Key finding callout */}

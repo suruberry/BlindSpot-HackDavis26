@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { Fragment, useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import {
   MapContainer,
@@ -7,6 +7,7 @@ import {
   TileLayer,
   useMap,
   Polyline,
+  Circle,
 } from "react-leaflet"
 import L from "leaflet"
 import { AlertTriangle, FileWarning, MapPin } from "lucide-react"
@@ -14,6 +15,7 @@ import Navbar from "../components/Navbar"
 import { supabase } from "../lib/supabase"
 import type { Report } from "../lib/supabase"
 import { safestRoute, dangerousRoute } from "../data/mockRoutes"
+import { realIncidents } from "../data/realIncidents"
 
 const center: [number, number] = [38.5449, -121.7405]
 
@@ -60,9 +62,14 @@ function createDangerIcon(severity: string) {
   })
 }
 
+function sourceForReport(report: Report) {
+  return report.ai_classification ? "Community Report + AI" : "Community Report"
+}
+
 export default function MapPage() {
   const [showSafeRoute, setShowSafeRoute] = useState(false)
   const [reports, setReports] = useState<Report[]>([])
+  const combinedReports = [...realIncidents, ...reports]
 
   useEffect(() => {
     async function load() {
@@ -94,43 +101,62 @@ export default function MapPage() {
             url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
           />
 
-          {reports.map((report) => (
-            <Marker
-              key={report.id}
-              position={[report.latitude, report.longitude]}
-              icon={createDangerIcon(report.severity)}
-            >
-              <Popup>
-                <div className="min-w-[200px]">
-                  <h3 className="text-base font-bold">{report.type}</h3>
-                  <p className="mt-1 text-sm text-gray-600">{report.location}</p>
-                  {report.note && (
-                    <p className="mt-2 text-sm italic text-gray-500">"{report.note}"</p>
-                  )}
-                  {report.ai_classification && (
-                    <div className="mt-2 rounded-lg bg-orange-50 p-2">
-                      <p className="text-xs font-bold text-orange-600">AI Insight</p>
-                      <p className="text-xs text-gray-600">
-                        {report.ai_classification.suggested_fix}
+          {combinedReports.map((report) => {
+            const source = "source" in report ? report.source : sourceForReport(report)
+            const detail = "description" in report ? report.description : report.note
+            const suggestedFix = report.ai_classification?.suggested_fix
+
+            return (
+              <Fragment key={report.id}>
+                <Circle
+                  center={[report.latitude, report.longitude]}
+                  radius={report.severity === "High" ? 145 : report.severity === "Medium" ? 105 : 75}
+                  pathOptions={{
+                    color: report.severity === "High" ? "#ef4444" : "#f97316",
+                    fillColor: report.severity === "High" ? "#ef4444" : "#f97316",
+                    fillOpacity: report.severity === "High" ? 0.18 : 0.11,
+                    opacity: 0.45,
+                    weight: 1,
+                  }}
+                />
+                <Marker
+                  position={[report.latitude, report.longitude]}
+                  icon={createDangerIcon(report.severity)}
+                >
+                  <Popup>
+                    <div className="min-w-[220px]">
+                      <h3 className="text-base font-bold">{report.type}</h3>
+                      <p className="mt-1 text-sm text-gray-600">{report.location}</p>
+                      <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-orange-600">
+                        Source: {source}
                       </p>
+                      {detail && (
+                        <p className="mt-2 text-sm italic text-gray-500">"{detail}"</p>
+                      )}
+                      {suggestedFix && (
+                        <div className="mt-2 rounded-lg bg-orange-50 p-2">
+                          <p className="text-xs font-bold text-orange-600">Infrastructure Recommendation</p>
+                          <p className="text-xs text-gray-600">{suggestedFix}</p>
+                        </div>
+                      )}
+                      <div className="mt-3 flex items-center justify-between">
+                        <span className={`rounded-full px-3 py-1 text-xs font-bold ${
+                          report.severity === "High" ? "bg-red-100 text-red-600"
+                          : report.severity === "Medium" ? "bg-yellow-100 text-yellow-700"
+                          : "bg-green-100 text-green-700"
+                        }`}>
+                          {report.severity}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {new Date(report.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
                     </div>
-                  )}
-                  <div className="mt-3 flex items-center justify-between">
-                    <span className={`rounded-full px-3 py-1 text-xs font-bold ${
-                      report.severity === "High" ? "bg-red-100 text-red-600"
-                      : report.severity === "Medium" ? "bg-yellow-100 text-yellow-700"
-                      : "bg-green-100 text-green-700"
-                    }`}>
-                      {report.severity}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {new Date(report.created_at).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
+                  </Popup>
+                </Marker>
+              </Fragment>
+            )
+          })}
 
           {showSafeRoute && (
             <>
@@ -155,12 +181,20 @@ export default function MapPage() {
             </div>
             <span className="flex items-center gap-1.5 text-xs text-green-400">
               <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
-              {reports.length} reports
+              {combinedReports.length} signals
             </span>
           </div>
           <p className="mt-1 text-sm text-gray-300">
-            Community-reported near misses around Davis.
+            Public crash hotspots plus live community near-misses.
           </p>
+          <div className="mt-3 flex gap-2 text-[11px] font-semibold">
+            <span className="rounded-full bg-red-500/20 px-2 py-1 text-red-300">
+              {realIncidents.length} public hotspots
+            </span>
+            <span className="rounded-full bg-green-500/20 px-2 py-1 text-green-300">
+              {reports.length} community reports
+            </span>
+          </div>
         </div>
 
         {/* Safe route button */}
@@ -198,7 +232,7 @@ export default function MapPage() {
           )}
 
           <div className="mt-4 space-y-3">
-            {reports
+            {combinedReports
               .filter((r) => r.severity === "High")
               .slice(0, 2)
               .map((report) => (

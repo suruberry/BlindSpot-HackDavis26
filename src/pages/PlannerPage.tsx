@@ -3,6 +3,7 @@ import { Building2, Send, Loader2, Sparkles } from "lucide-react"
 import Navbar from "../components/Navbar"
 import { supabase } from "../lib/supabase"
 import type { Report } from "../lib/supabase"
+import { realIncidents } from "../data/realIncidents"
 
 type Message = {
   role: "user" | "assistant"
@@ -17,14 +18,16 @@ const SUGGESTED_QUESTIONS = [
   "Which areas are dangerous at night?",
 ]
 
-async function askClaude(messages: Message[], reports: Report[]): Promise<string> {
+type PlannerReport = Report | (typeof realIncidents)[number]
+
+async function askClaude(messages: Message[], reports: PlannerReport[]): Promise<string> {
   const reportSummary = reports.map(r =>
-    `- ${r.type} at ${r.location} (Severity: ${r.severity})${r.note ? `: "${r.note}"` : ""}${r.ai_classification ? ` | AI fix: ${r.ai_classification.suggested_fix}` : ""}`
+    `- ${r.type} at ${r.location} (Severity: ${r.severity}; Source: ${"source" in r ? r.source : "Community Report"})${"description" in r ? `: "${r.description}"` : r.note ? `: "${r.note}"` : ""}${r.ai_classification ? ` | Infrastructure fix: ${r.ai_classification.suggested_fix}` : ""}`
   ).join("\n")
 
   const systemPrompt = `You are an AI urban planning assistant for the city of Davis, CA, specializing in cyclist safety infrastructure.
 
-You have access to real community-reported near-miss data from the BlindSpot platform. Here is the current dataset of ${reports.length} reports:
+You have access to a blended Davis cyclist safety dataset: public crash hotspot data from the City of Davis Local Road Safety Plan/SWITRS plus live BlindSpot community near-miss reports. Here are the current ${reports.length} safety signals:
 
 ${reportSummary}
 
@@ -57,6 +60,7 @@ export default function PlannerPage() {
   const [loading, setLoading] = useState(false)
   const [loadingReports, setLoadingReports] = useState(true)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const combinedReports = [...realIncidents, ...reports]
 
   useEffect(() => {
     async function load() {
@@ -79,7 +83,7 @@ export default function PlannerPage() {
     setInput("")
     setLoading(true)
 
-    const reply = await askClaude(newMessages, reports)
+    const reply = await askClaude(newMessages, combinedReports)
     setMessages([...newMessages, { role: "assistant", content: reply }])
     setLoading(false)
   }
@@ -100,7 +104,7 @@ export default function PlannerPage() {
           {!loadingReports && (
             <div className="mt-3 flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-xs text-green-400">{reports.length} real reports loaded</span>
+              <span className="text-xs text-green-400">{combinedReports.length} safety signals loaded</span>
             </div>
           )}
         </div>
@@ -145,7 +149,7 @@ export default function PlannerPage() {
               <div className="bg-zinc-900 border border-zinc-800 rounded-2xl px-4 py-3">
                 <div className="flex items-center gap-2 text-orange-400">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  <span className="text-xs">Analyzing {reports.length} reports...</span>
+                  <span className="text-xs">Analyzing {combinedReports.length} signals...</span>
                 </div>
               </div>
             </div>

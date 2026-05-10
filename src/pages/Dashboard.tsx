@@ -3,8 +3,8 @@ import Navbar from "../components/Navbar"
 import { AlertTriangle, Bike, Clock3, MapPin, Loader2 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { supabase } from "../lib/supabase"
-import { seedDatabase } from "../lib/seedData"
 import type { Report } from "../lib/supabase"
+import { realIncidents } from "../data/realIncidents"
 
 export default function Dashboard() {
   const [reports, setReports] = useState<Report[]>([])
@@ -12,7 +12,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function load() {
-      await seedDatabase()
       const { data } = await supabase
         .from("reports")
         .select("*")
@@ -34,10 +33,11 @@ export default function Dashboard() {
     return () => { supabase.removeChannel(channel) }
   }, [])
 
-  const highRisk = reports.filter((r) => r.severity === "High")
-  const mostReported = reports.length > 0
+  const combinedReports = [...realIncidents, ...reports]
+  const highRisk = combinedReports.filter((r) => r.severity === "High")
+  const mostReported = combinedReports.length > 0
     ? Object.entries(
-        reports.reduce((acc, r) => {
+        combinedReports.reduce((acc, r) => {
           acc[r.location] = (acc[r.location] || 0) + 1
           return acc
         }, {} as Record<string, number>)
@@ -56,8 +56,8 @@ export default function Dashboard() {
             Infrastructure Risk Dashboard
           </h1>
           <p className="mt-4 text-gray-400">
-            Community-powered near-miss intelligence helping identify
-            dangerous cyclist infrastructure before accidents occur.
+            Public crash hotspot data and community near-miss reports helping identify
+            dangerous cyclist infrastructure before someone gets hurt.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link to="/map" className="rounded-full bg-white px-6 py-3 font-bold text-black">
@@ -78,8 +78,8 @@ export default function Dashboard() {
             <div className="grid grid-cols-2 gap-4">
               <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-5">
                 <AlertTriangle className="mb-4 h-7 w-7 text-orange-400" />
-                <p className="text-sm text-gray-400">Total Reports</p>
-                <h2 className="mt-2 text-4xl font-bold">{reports.length}</h2>
+                <p className="text-sm text-gray-400">Safety Signals</p>
+                <h2 className="mt-2 text-4xl font-bold">{combinedReports.length}</h2>
               </div>
               <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-5">
                 <Bike className="mb-4 h-7 w-7 text-orange-400" />
@@ -93,9 +93,17 @@ export default function Dashboard() {
               </div>
               <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-5">
                 <MapPin className="mb-4 h-7 w-7 text-orange-400" />
-                <p className="text-sm text-gray-400">Most Reported Area</p>
-                <h2 className="mt-2 text-xl font-bold">{mostReported}</h2>
+                <p className="text-sm text-gray-400">Public Hotspots</p>
+                <h2 className="mt-2 text-4xl font-bold">{realIncidents.length}</h2>
               </div>
+            </div>
+
+            <div className="mt-4 rounded-2xl border border-orange-500/20 bg-orange-500/10 p-4">
+              <p className="text-sm font-semibold text-orange-400">Most concentrated area</p>
+              <p className="mt-1 text-lg font-bold">{mostReported}</p>
+              <p className="mt-1 text-xs text-gray-400">
+                Data blend: Davis LRSP/SWITRS public hotspots + live BlindSpot reports.
+              </p>
             </div>
 
             <div className="mt-10">
@@ -108,7 +116,7 @@ export default function Dashboard() {
               </div>
 
               <div className="mt-6 space-y-4">
-                {reports.map((report) => (
+                {combinedReports.map((report) => (
                   <div key={report.id} className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
                     <div className="flex items-center justify-between">
                       <div>
@@ -125,10 +133,13 @@ export default function Dashboard() {
                     </div>
                     {report.ai_classification && (
                       <div className="mt-3 rounded-xl bg-orange-500/10 border border-orange-500/20 p-3">
-                        <p className="text-xs text-orange-400 font-semibold">AI Analysis</p>
+                        <p className="text-xs text-orange-400 font-semibold">Infrastructure Recommendation</p>
                         <p className="mt-1 text-xs text-gray-300">{report.ai_classification.suggested_fix}</p>
                       </div>
                     )}
+                    <p className="mt-3 text-xs font-semibold text-orange-400">
+                      Source: {"source" in report ? report.source : "Community Report"}
+                    </p>
                     <p className="mt-3 text-xs text-gray-500">
                       {new Date(report.created_at).toLocaleString()}
                     </p>
