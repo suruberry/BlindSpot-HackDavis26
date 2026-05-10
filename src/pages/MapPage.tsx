@@ -206,9 +206,6 @@ export default function MapPage() {
           )}
         </MapContainer>
 
-        <div className="pointer-events-none absolute left-5 top-44 z-[950] h-24 w-24 rounded-full bg-red-500/10 blur-2xl" />
-        <div className="pointer-events-none absolute right-8 top-72 z-[950] h-24 w-24 rounded-full bg-orange-400/10 blur-2xl" />
-
         <div className="absolute left-5 right-5 top-5 z-[1000] rounded-[1.35rem] bg-red-500 px-4 py-4 text-white shadow-xl shadow-red-200">
           <div className="flex items-center gap-3">
             <AlertTriangle className="h-6 w-6 shrink-0" />
@@ -283,7 +280,7 @@ export default function MapPage() {
           <p className="mt-1 text-sm font-semibold text-slate-500">
             {mapMode === "markers"
               ? "Tap markers for source, severity, and recommendations."
-              : "Heatmap mode shows larger risk fields where severe reports cluster."}
+              : "Heatmap mode uses map-anchored risk circles that scale as you zoom."}
           </p>
 
           <div className="mt-4 flex flex-wrap gap-2">
