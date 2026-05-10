@@ -50,7 +50,7 @@ Davis is one of the most bike-heavy cities in the United States, but even bike-f
 
 Public crash datasets are valuable, but they usually capture collisions after harm has happened. Near-misses are earlier signals. BlindSpot helps surface those signals while there is still time to fix the street design.
 
-In our initial Davis cyclist survey, 78% of respondents said they would not report a near-miss to police or the city. BlindSpot makes that reporting step simple enough to actually happen.
+In our initial Davis cyclist survey, only 1 of 12 respondents said they would report a close call to police or the city. 92% either would not report it or would not know how. BlindSpot makes that reporting step simple enough to actually happen.
 
 ---
 

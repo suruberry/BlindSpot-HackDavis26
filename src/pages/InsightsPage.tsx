@@ -1,185 +1,283 @@
 import Navbar from "../components/Navbar"
-import { Users, AlertTriangle, Eye, Zap } from "lucide-react"
+import { AlertTriangle, Bell, CheckCircle2, Eye, MapPinned, Users } from "lucide-react"
 
-const responses = 9
+const responses = 12
 
 const stats = [
   {
-    icon: Users,
-    value: "78%",
-    label: "Would NOT report a near-miss to police or city",
-    sub: "7 out of 9 respondents",
+    icon: AlertTriangle,
+    value: "92%",
+    label: "Would not report, or would not know how",
+    sub: "11 out of 12 respondents",
     color: "text-red-500",
     bg: "bg-red-50 border-red-100",
   },
   {
-    icon: AlertTriangle,
-    value: "56%",
-    label: "Have experienced 1 or more near-misses in 6 months",
-    sub: "5 out of 9 respondents",
+    icon: Eye,
+    value: "67%",
+    label: "Experienced at least one near-miss in 6 months",
+    sub: "8 out of 12 respondents",
     color: "text-orange-500",
     bg: "bg-orange-50 border-orange-100",
   },
   {
-    icon: Zap,
-    value: "89%",
-    label: "Would tag a dangerous location to warn other students",
-    sub: "8 out of 9 respondents said yes or maybe",
+    icon: CheckCircle2,
+    value: "92%",
+    label: "Would tag a dangerous location if it is fast",
+    sub: "9 yes, 2 if it is super fast",
     color: "text-green-600",
     bg: "bg-green-50 border-green-100",
   },
   {
-    icon: Eye,
-    value: "3.7 / 5",
-    label: "Average helpfulness rating for proximity safety alerts",
-    sub: "Cyclists want proactive warnings",
+    icon: Bell,
+    value: "3.4 / 5",
+    label: "Average helpfulness rating for safety alerts",
+    sub: "5 was the most common rating",
     color: "text-zinc-900",
-    bg: "bg-white/70 border-zinc-200",
+    bg: "bg-white/75 border-zinc-200",
   },
 ]
 
+const reportIntent = [
+  { label: "No", count: 7, color: "bg-red-500" },
+  { label: "Wouldn't know how", count: 4, color: "bg-orange-500" },
+  { label: "Yes", count: 1, color: "bg-green-600" },
+]
+
 const infraIssues = [
-  { label: "Bike lane ending abruptly", count: 7 },
-  { label: "Right-hook risks", count: 6 },
-  { label: "Poor lighting at night", count: 6 },
-  { label: "Slippery/uneven pavement", count: 5 },
+  { label: "Right-hook risks", count: 8, color: "bg-red-500" },
+  { label: "Bike lane ending abruptly", count: 7, color: "bg-orange-500" },
+  { label: "Poor lighting/visibility", count: 7, color: "bg-yellow-500" },
+  { label: "Slippery/uneven pavement", count: 7, color: "bg-zinc-600" },
 ]
 
 const nearMisses = [
-  { label: "0 near-misses", count: 4, pct: 44 },
-  { label: "1–2 near-misses", count: 2, pct: 22 },
-  { label: "3–5 near-misses", count: 2, pct: 22 },
-  { label: "5+ near-misses", count: 1, pct: 11 },
+  { label: "0", count: 4, color: "bg-zinc-400" },
+  { label: "1-2", count: 2, color: "bg-yellow-500" },
+  { label: "3-5", count: 2, color: "bg-orange-500" },
+  { label: "5+", count: 4, color: "bg-red-500" },
 ]
 
-const bikeFreq = [
-  { label: "Daily", count: 3, pct: 33 },
-  { label: "Weekly", count: 2, pct: 22 },
-  { label: "Rarely", count: 2, pct: 22 },
-  { label: "Never", count: 2, pct: 22 },
+const bikeFrequency = [
+  { label: "Daily", count: 6, color: "bg-zinc-900" },
+  { label: "Weekly", count: 2, color: "bg-zinc-500" },
+  { label: "Rarely", count: 2, color: "bg-zinc-400" },
+  { label: "Never", count: 2, color: "bg-zinc-300" },
 ]
+
+const alertRatings = [
+  { label: "1", count: 2 },
+  { label: "2", count: 2 },
+  { label: "3", count: 2 },
+  { label: "4", count: 1 },
+  { label: "5", count: 5 },
+]
+
+const tagWillingness = [
+  { label: "Yes", count: 9, color: "bg-green-600" },
+  { label: "Only if super fast", count: 2, color: "bg-orange-500" },
+  { label: "No", count: 1, color: "bg-red-500" },
+]
+
+function pct(count: number) {
+  return Math.round((count / responses) * 100)
+}
+
+function HorizontalBars({
+  data,
+  max = responses,
+}: {
+  data: { label: string; count: number; color: string }[]
+  max?: number
+}) {
+  return (
+    <div className="space-y-4">
+      {data.map((item) => (
+        <div key={item.label}>
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <span className="text-sm font-semibold text-zinc-700">{item.label}</span>
+            <span className="shrink-0 text-sm font-black text-zinc-900">
+              {item.count}/{responses}
+            </span>
+          </div>
+          <div className="h-3 overflow-hidden rounded-full bg-zinc-200">
+            <div
+              className={`h-full rounded-full ${item.color}`}
+              style={{ width: `${(item.count / max) * 100}%` }}
+            />
+          </div>
+          <p className="mt-1 text-xs font-semibold text-zinc-500">{pct(item.count)}%</p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function DistributionChart({
+  data,
+  max,
+}: {
+  data: { label: string; count: number }[]
+  max: number
+}) {
+  return (
+    <div className="flex h-40 items-end gap-3 rounded-3xl border border-zinc-200 bg-white/70 px-4 pb-4 pt-6">
+      {data.map((item) => (
+        <div key={item.label} className="flex flex-1 flex-col items-center gap-2">
+          <div className="flex h-24 w-full items-end justify-center">
+            <div
+              className="w-full max-w-10 rounded-t-2xl bg-zinc-900"
+              style={{ height: `${Math.max(10, (item.count / max) * 100)}%` }}
+            />
+          </div>
+          <p className="text-xs font-black text-zinc-900">{item.count}</p>
+          <p className="text-xs font-semibold text-zinc-500">{item.label}</p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function StackedBar({
+  data,
+}: {
+  data: { label: string; count: number; color: string }[]
+}) {
+  return (
+    <div>
+      <div className="flex h-5 overflow-hidden rounded-full bg-zinc-200">
+        {data.map((item) => (
+          <div
+            key={item.label}
+            className={item.color}
+            style={{ width: `${pct(item.count)}%` }}
+            title={`${item.label}: ${item.count}`}
+          />
+        ))}
+      </div>
+      <div className="mt-3 grid gap-2">
+        {data.map((item) => (
+          <div key={item.label} className="flex items-center justify-between gap-3">
+            <span className="flex items-center gap-2 text-sm font-semibold text-zinc-700">
+              <span className={`h-2.5 w-2.5 rounded-full ${item.color}`} />
+              {item.label}
+            </span>
+            <span className="text-sm font-black text-zinc-900">
+              {item.count} ({pct(item.count)}%)
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 export default function InsightsPage() {
   return (
     <div className="app-shell">
       <div className="mobile-canvas pb-32">
-
-        <p className="eyebrow">
-          User Research
-        </p>
-        <h1 className="display-title text-4xl">
-          Community Insights
-        </h1>
+        <p className="eyebrow">User Research</p>
+        <h1 className="display-title text-4xl">Community Insights</h1>
         <p className="muted-copy mt-3">
           See it. Signal it. Fix it.
         </p>
 
-        {/* Key finding callout */}
         <div className="glass-panel mt-6 rounded-3xl p-5">
-          <p className="text-xs font-bold uppercase tracking-widest text-orange-600">
-            Key Finding
-          </p>
-          <p className="mt-2 text-xl font-bold leading-snug">
-            78% of cyclists wouldn't report a near-miss — because they don't know how.
-          </p>
-          <p className="mt-2 text-sm text-gray-400">
-            BlindSpot makes the signal simple.
-          </p>
+          <div className="flex items-start gap-3">
+            <Users className="mt-1 h-5 w-5 shrink-0 text-zinc-700" />
+            <div>
+              <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
+                12 Davis cyclist responses
+              </p>
+              <p className="mt-2 text-xl font-black leading-snug text-zinc-900">
+                The biggest gap is not awareness. It is reporting friction.
+              </p>
+              <p className="muted-copy mt-2 text-sm">
+                Only 1 of 12 respondents said they would report a close call to police or the city.
+              </p>
+            </div>
+          </div>
         </div>
 
-        {/* Stat cards */}
-        <div className="mt-8 space-y-4">
+        <section className="mt-8 space-y-4">
           {stats.map((s) => (
-            <div
-              key={s.label}
-              className={`rounded-3xl border p-5 ${s.bg}`}
-            >
+            <div key={s.label} className={`rounded-3xl border p-5 ${s.bg}`}>
               <div className="flex items-start gap-4">
                 <s.icon className={`mt-1 h-6 w-6 shrink-0 ${s.color}`} />
                 <div>
-                  <p className={`text-3xl font-bold ${s.color}`}>{s.value}</p>
-                  <p className="mt-1 font-semibold text-zinc-900">{s.label}</p>
+                  <p className={`text-3xl font-black ${s.color}`}>{s.value}</p>
+                  <p className="mt-1 font-bold text-zinc-900">{s.label}</p>
                   <p className="mt-1 text-sm text-zinc-500">{s.sub}</p>
                 </div>
               </div>
             </div>
           ))}
-        </div>
+        </section>
 
-        {/* Infrastructure issues */}
-        <div className="mt-10">
-          <h2 className="text-2xl font-bold">Top Infrastructure Issues</h2>
-          <p className="mt-1 text-sm text-gray-400">
-            What makes Davis cyclists feel unsafe
+        <section className="glass-panel mt-8 rounded-3xl p-5">
+          <div className="mb-5 flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-red-500" />
+            <div>
+              <h2 className="text-xl font-black">Reporting Gap</h2>
+              <p className="text-sm text-zinc-500">Would riders report a close call today?</p>
+            </div>
+          </div>
+          <StackedBar data={reportIntent} />
+        </section>
+
+        <section className="soft-card mt-8 rounded-3xl p-5">
+          <div className="mb-5 flex items-center gap-2">
+            <MapPinned className="h-5 w-5 text-orange-500" />
+            <div>
+              <h2 className="text-xl font-black">Top Infrastructure Issues</h2>
+              <p className="text-sm text-zinc-500">What made riders feel unsafe</p>
+            </div>
+          </div>
+          <HorizontalBars data={infraIssues} />
+        </section>
+
+        <section className="mt-8">
+          <h2 className="text-2xl font-black">Near-Miss Frequency</h2>
+          <p className="muted-copy mt-1 text-sm">In the last 6 months</p>
+          <div className="mt-5">
+            <HorizontalBars data={nearMisses} max={4} />
+          </div>
+        </section>
+
+        <section className="mt-8">
+          <h2 className="text-2xl font-black">Safety Alert Interest</h2>
+          <p className="muted-copy mt-1 text-sm">
+            Rating for a phone vibration near known hot spots
           </p>
-          <div className="mt-5 space-y-4">
-            {infraIssues.map((issue) => (
-              <div key={issue.label}>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">{issue.label}</span>
-                  <span className="text-sm text-orange-600 font-bold">
-                    {issue.count}/{responses}
-                  </span>
-                </div>
-                <div className="h-2 w-full rounded-full bg-zinc-200">
-                  <div
-                    className="h-2 rounded-full bg-orange-500 transition-all"
-                    style={{ width: `${(issue.count / responses) * 100}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+          <div className="mt-5">
+            <DistributionChart data={alertRatings} max={5} />
           </div>
-        </div>
+        </section>
 
-        {/* Near miss frequency */}
-        <div className="mt-10">
-          <h2 className="text-2xl font-bold">Near-Miss Frequency</h2>
-          <p className="mt-1 text-sm text-gray-400">In the last 6 months</p>
-          <div className="mt-5 space-y-4">
-            {nearMisses.map((item) => (
-              <div key={item.label}>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">{item.label}</span>
-                  <span className="text-sm text-gray-400">{item.pct}%</span>
-                </div>
-                <div className="h-2 w-full rounded-full bg-zinc-200">
-                  <div
-                    className="h-2 rounded-full bg-zinc-500 transition-all"
-                    style={{ width: `${item.pct}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Bike frequency */}
-        <div className="mt-10">
-          <h2 className="text-2xl font-bold">How Often They Bike</h2>
-          <p className="mt-1 text-sm text-gray-400">
-            Through high-traffic Davis intersections
+        <section className="glass-panel mt-8 rounded-3xl p-5">
+          <h2 className="text-xl font-black">3-Second Tagging</h2>
+          <p className="mb-5 mt-1 text-sm text-zinc-500">
+            Would riders tag danger at the end of a ride?
           </p>
-          <div className="mt-5 grid grid-cols-2 gap-3">
-            {bikeFreq.map((item) => (
-              <div
-                key={item.label}
-                className="soft-card rounded-2xl p-4 text-center"
-              >
-                <p className="text-3xl font-bold text-zinc-900">{item.pct}%</p>
-                <p className="mt-1 text-sm text-zinc-500">{item.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+          <StackedBar data={tagWillingness} />
+        </section>
 
-        {/* Quote */}
-        <div className="soft-card mt-10 rounded-3xl p-6">
-          <p className="text-lg font-medium leading-relaxed text-zinc-700 italic">
+        <section className="mt-8 grid grid-cols-2 gap-3">
+          {bikeFrequency.map((item) => (
+            <div key={item.label} className="soft-card rounded-3xl p-4">
+              <div className={`mb-4 h-2 w-10 rounded-full ${item.color}`} />
+              <p className="text-3xl font-black text-zinc-900">{pct(item.count)}%</p>
+              <p className="mt-1 text-sm font-semibold text-zinc-500">{item.label}</p>
+            </div>
+          ))}
+        </section>
+
+        <div className="soft-card mt-8 rounded-3xl p-6">
+          <p className="text-lg font-semibold leading-relaxed text-zinc-700 italic">
             "I wouldn't know how to report a near-miss even if I wanted to."
           </p>
-          <p className="mt-3 text-sm text-orange-600">
-            — Davis cyclist, May 2026 survey
+          <p className="mt-3 text-sm font-bold text-zinc-500">
+            Davis cyclist survey, May 2026
           </p>
         </div>
 
