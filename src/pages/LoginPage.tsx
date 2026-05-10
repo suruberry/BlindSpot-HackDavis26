@@ -1,5 +1,6 @@
 import { useState } from "react"
-import { Bike, Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
+import BlindSpotLogo from "../components/BlindSpotLogo"
 import { useAuth } from "../lib/auth"
 
 export default function LoginPage() {
@@ -38,12 +39,14 @@ export default function LoginPage() {
     <div className="app-shell items-center p-6">
       <div className="glass-panel w-full max-w-sm rounded-[2rem] p-6">
         <div className="mb-8 flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10">
-            <Bike className="h-7 w-7 text-zinc-200" />
-          </div>
+          <BlindSpotLogo className="h-14 w-14 shrink-0" />
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-zinc-200">BlindSpot</p>
-            <p className="text-sm text-gray-500">See it. Signal it. Fix it.</p>
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-zinc-500">
+              BlindSpot
+            </p>
+            <p className="text-base font-semibold text-zinc-700">
+              See it. Signal it. Fix it.
+            </p>
           </div>
         </div>
 
@@ -107,7 +110,7 @@ export default function LoginPage() {
             setError("")
             setNotice("")
           }}
-          className="mt-4 w-full text-center text-sm text-gray-400"
+          className="mt-4 w-full text-center text-sm font-semibold text-zinc-500"
         >
           {isSignUp
             ? "Already have an account? Sign in"
