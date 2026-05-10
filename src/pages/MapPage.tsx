@@ -21,7 +21,7 @@ const center: [number, number] = [38.5449, -121.7405]
 
 function SetView() {
   const map = useMap()
-  map.setView(center, 14)
+  map.setView(center, 15)
   return null
 }
 
@@ -44,7 +44,7 @@ function createDangerIcon(severity: string) {
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.22);
+      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.24);
     ">
       <div style="
         width: ${size * 0.42}px;
@@ -95,11 +95,16 @@ export default function MapPage() {
   return (
     <div className="app-shell">
       <div className="relative h-screen w-full max-w-[430px] overflow-hidden bg-[#f6f8fb]">
-        <MapContainer className="h-full w-full" center={center} zoom={14}>
+        <MapContainer className="h-full w-full" center={center} zoom={15} zoomControl={false}>
           <SetView />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
             url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          />
+          <TileLayer
+            attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
+            url="https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png"
+            pane="shadowPane"
           />
 
           {combinedReports.map((report) => {
@@ -111,12 +116,12 @@ export default function MapPage() {
               <Fragment key={report.id}>
                 <Circle
                   center={[report.latitude, report.longitude]}
-                  radius={report.severity === "High" ? 90 : report.severity === "Medium" ? 70 : 50}
+                  radius={report.severity === "High" ? 70 : report.severity === "Medium" ? 54 : 40}
                   pathOptions={{
                     color: report.severity === "High" ? "#ef4444" : "#f97316",
                     fillColor: report.severity === "High" ? "#ef4444" : "#f97316",
-                    fillOpacity: report.severity === "High" ? 0.08 : 0.06,
-                    opacity: 0.28,
+                    fillOpacity: report.severity === "High" ? 0.12 : 0.08,
+                    opacity: 0.38,
                     weight: 1,
                   }}
                 />
@@ -173,41 +178,39 @@ export default function MapPage() {
           )}
         </MapContainer>
 
-        <div className="pointer-events-none absolute inset-0 z-[900] bg-white/55 backdrop-blur-[1px]" />
-        <div className="pointer-events-none absolute left-4 top-52 z-[950] h-36 w-36 rounded-full bg-red-500/35 blur-3xl" />
-        <div className="pointer-events-none absolute right-0 top-72 z-[950] h-32 w-32 rounded-full bg-orange-400/35 blur-3xl" />
-        <div className="pointer-events-none absolute left-16 bottom-72 z-[950] h-28 w-28 rounded-full bg-yellow-300/35 blur-3xl" />
+        <div className="pointer-events-none absolute left-5 top-44 z-[950] h-24 w-24 rounded-full bg-red-500/10 blur-2xl" />
+        <div className="pointer-events-none absolute right-8 top-72 z-[950] h-24 w-24 rounded-full bg-orange-400/10 blur-2xl" />
 
-        <div className="absolute left-7 right-7 top-20 z-[1000] rounded-[1.65rem] bg-red-500 px-5 py-5 text-white shadow-xl shadow-red-200">
+        <div className="absolute left-5 right-5 top-5 z-[1000] rounded-[1.35rem] bg-red-500 px-4 py-4 text-white shadow-xl shadow-red-200">
           <div className="flex items-center gap-3">
-            <AlertTriangle className="h-7 w-7 shrink-0" />
+            <AlertTriangle className="h-6 w-6 shrink-0" />
             <div>
-              <h1 className="text-lg font-black">High Right-Hook Risk Zone</h1>
+              <h1 className="text-base font-black">High Risk Zones</h1>
               <p className="mt-1 text-sm font-semibold text-red-50">
-                {combinedReports.length} incidents across Davis signals
+                {combinedReports.length} Davis safety signals
               </p>
             </div>
           </div>
         </div>
 
-        <div className="absolute right-7 top-48 z-[1000] rounded-[1.5rem] bg-white p-5 text-[#063664] shadow-xl shadow-slate-200">
-          <p className="mb-3 text-sm font-black">Danger Levels</p>
-          <div className="space-y-2 text-sm font-semibold text-slate-700">
+        <div className="absolute right-5 top-28 z-[1000] rounded-[1.25rem] bg-white/95 p-4 text-[#063664] shadow-xl shadow-slate-200">
+          <p className="mb-2 text-xs font-black">Danger Levels</p>
+          <div className="space-y-1.5 text-xs font-semibold text-slate-700">
             <div className="flex items-center gap-2">
-              <span className="h-4 w-4 rounded-full bg-red-500" /> High
+              <span className="h-3 w-3 rounded-full bg-red-500" /> High
             </div>
             <div className="flex items-center gap-2">
-              <span className="h-4 w-4 rounded-full bg-orange-500" /> Medium
+              <span className="h-3 w-3 rounded-full bg-orange-500" /> Medium
             </div>
             <div className="flex items-center gap-2">
-              <span className="h-4 w-4 rounded-full bg-yellow-400" /> Low
+              <span className="h-3 w-3 rounded-full bg-yellow-400" /> Low
             </div>
           </div>
         </div>
 
         <button
           onClick={() => setShowSafeRoute(!showSafeRoute)}
-          className="primary-action absolute left-7 top-44 z-[1000] rounded-full px-5 py-3 text-sm"
+          className="primary-action absolute left-5 top-28 z-[1000] rounded-full px-4 py-2.5 text-sm"
         >
           {showSafeRoute ? "Hide route" : "Safer route"}
         </button>
@@ -215,24 +218,24 @@ export default function MapPage() {
         {/* Report FAB */}
         <Link
           to="/report"
-          className="primary-action absolute bottom-56 right-7 z-[1000] flex h-14 w-14 items-center justify-center rounded-full"
+          className="primary-action absolute bottom-52 right-5 z-[1000] flex h-13 w-13 items-center justify-center rounded-full"
         >
           <FileWarning className="h-7 w-7" />
         </Link>
 
-        <div className="absolute bottom-20 left-0 right-0 z-[1000] rounded-t-[2.25rem] bg-white px-7 pb-8 pt-5 text-[#063664] shadow-2xl shadow-slate-300">
-          <div className="mx-auto mb-5 h-1 w-12 rounded-full bg-slate-300" />
+        <div className="absolute bottom-20 left-0 right-0 z-[1000] max-h-[42vh] overflow-y-auto rounded-t-[2rem] bg-white px-6 pb-7 pt-4 text-[#063664] shadow-2xl shadow-slate-300">
+          <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-slate-300" />
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-2xl font-black">
+            <h2 className="text-xl font-black">
               {highRiskLocation(combinedReports)}
             </h2>
             <span className="rounded-full bg-red-100 px-3 py-1 text-sm font-black text-red-600">
               {combinedReports.length} reports
             </span>
           </div>
-          <p className="mt-2 font-semibold text-slate-500">Last reported from live community signals</p>
+          <p className="mt-1 text-sm font-semibold text-slate-500">Tap markers for source, severity, and recommendations.</p>
 
-          <div className="mt-5 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap gap-2">
             <span className="rounded-xl bg-[#063664] px-4 py-2 text-sm font-bold text-white">Right Hook</span>
             <span className="rounded-xl bg-[#063664] px-4 py-2 text-sm font-bold text-white">Close Pass</span>
             <span className="rounded-xl bg-[#063664] px-4 py-2 text-sm font-bold text-white">Poor Lighting</span>
