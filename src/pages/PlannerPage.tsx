@@ -89,22 +89,22 @@ export default function PlannerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white flex justify-center">
-      <div className="flex flex-col w-full max-w-md h-screen pb-20">
+    <div className="app-shell">
+      <div className="flex h-screen w-full max-w-[430px] flex-col pb-20">
 
-        <div className="p-6 border-b border-zinc-800 shrink-0">
+        <div className="glass-panel m-4 mb-0 shrink-0 rounded-3xl p-5">
           <div className="flex items-center gap-2">
-            <Building2 className="h-6 w-6 text-orange-400" />
-            <p className="text-sm uppercase tracking-[0.3em] text-orange-400">City Planner Mode</p>
+            <Building2 className="h-6 w-6 text-orange-500" />
+            <p className="eyebrow">City Planner Mode</p>
           </div>
-          <h1 className="mt-2 text-3xl font-bold">AI Safety Analyst</h1>
-          <p className="mt-1 text-sm text-gray-400">
-            Ask questions about Davis cyclist safety data. Powered by Claude.
+          <h1 className="mt-2 text-3xl font-black">AI Safety Analyst</h1>
+          <p className="muted-copy mt-1 text-sm">
+            Turn safety signals into fixes.
           </p>
           {!loadingReports && (
             <div className="mt-3 flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-xs text-green-400">{combinedReports.length} safety signals loaded</span>
+              <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-xs text-green-600">{combinedReports.length} safety signals loaded</span>
             </div>
           )}
         </div>
@@ -117,9 +117,9 @@ export default function PlannerPage() {
                 <button
                   key={q}
                   onClick={() => sendMessage(q)}
-                  className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 p-4 text-left text-sm text-gray-300 hover:border-orange-500/50 hover:bg-orange-500/5 transition"
+                  className="soft-card w-full rounded-2xl p-4 text-left text-sm text-gray-300 transition hover:border-zinc-400 hover:bg-white/5"
                 >
-                  <Sparkles className="inline h-3.5 w-3.5 text-orange-400 mr-2" />
+                  <Sparkles className="inline h-3.5 w-3.5 text-orange-500 mr-2" />
                   {q}
                 </button>
               ))}
@@ -130,13 +130,13 @@ export default function PlannerPage() {
             <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
               <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                 msg.role === "user"
-                  ? "bg-orange-500 text-black font-medium"
-                  : "bg-zinc-900 border border-zinc-800 text-gray-200"
+                  ? "primary-action font-medium"
+                  : "soft-card text-gray-200"
               }`}>
                 {msg.role === "assistant" && (
                   <div className="flex items-center gap-1.5 mb-2">
-                    <Sparkles className="h-3.5 w-3.5 text-orange-400" />
-                    <span className="text-xs text-orange-400 font-semibold">Claude Analysis</span>
+                    <Sparkles className="h-3.5 w-3.5 text-orange-500" />
+                    <span className="text-xs text-orange-600 font-semibold">Claude Analysis</span>
                   </div>
                 )}
                 <p className="whitespace-pre-wrap">{msg.content}</p>
@@ -146,8 +146,8 @@ export default function PlannerPage() {
 
           {loading && (
             <div className="flex justify-start">
-              <div className="bg-zinc-900 border border-zinc-800 rounded-2xl px-4 py-3">
-                <div className="flex items-center gap-2 text-orange-400">
+              <div className="soft-card rounded-2xl px-4 py-3">
+                <div className="flex items-center gap-2 text-orange-600">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   <span className="text-xs">Analyzing {combinedReports.length} signals...</span>
                 </div>
@@ -158,19 +158,19 @@ export default function PlannerPage() {
           <div ref={bottomRef} />
         </div>
 
-        <div className="p-4 border-t border-zinc-800 shrink-0">
+        <div className="nav-glass shrink-0 border-t-0 p-4">
           <div className="flex gap-3">
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && sendMessage(input)}
               placeholder="Ask about cyclist safety in Davis..."
-              className="flex-1 rounded-2xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-white outline-none placeholder:text-gray-500 focus:border-orange-500/50"
+              className="flex-1 rounded-2xl border border-zinc-300 bg-white/70 px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-500 focus:border-zinc-500"
             />
             <button
               onClick={() => sendMessage(input)}
               disabled={!input.trim() || loading}
-              className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500 text-black disabled:opacity-40 shrink-0"
+              className="primary-action flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl disabled:opacity-40"
             >
               <Send className="h-5 w-5" />
             </button>

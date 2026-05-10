@@ -145,7 +145,7 @@ Map + Dashboard + AI Planner Context
 
 # Data Sources
 
-- City of Davis Local Road Safety Plan Executive Summary, 2023
+- City of Davis Transportation page, Local Road Safety Plan section, 2023
 - California Statewide Integrated Traffic Records System (SWITRS), as summarized in the Davis LRSP
 - BlindSpot live community near-miss submissions
 - Initial Davis cyclist survey responses collected for HackDavis 2026

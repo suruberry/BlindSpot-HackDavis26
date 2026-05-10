@@ -2,6 +2,7 @@ import Navbar from "../components/Navbar"
 import { useState } from "react"
 import { AlertTriangle, Bike, Car, Lightbulb, MapPin, Send, Loader2 } from "lucide-react"
 import { supabase } from "../lib/supabase"
+import { useAuth } from "../lib/auth"
 
 const incidentTypes = [
   { label: "Close pass", icon: Car },
@@ -74,60 +75,94 @@ Return exactly this JSON structure:
 }
 
 export default function ReportPage() {
+  const { user } = useAuth()
   const [selectedType, setSelectedType] = useState("")
   const [note, setNote] = useState("")
   const [location, setLocation] = useState("")
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [aiResult, setAiResult] = useState<any>(null)
+  const [submitError, setSubmitError] = useState("")
+  const [submittedReport, setSubmittedReport] = useState<{
+    location: string
+    severity: string
+  } | null>(null)
 
   async function handleSubmit() {
     if (!selectedType) return
     setLoading(true)
+    setSubmitError("")
 
-    const ai = await classifyWithClaude(selectedType, note)
-    setAiResult(ai)
+    try {
+      const ai = await classifyWithClaude(selectedType, note)
+      setAiResult(ai)
 
-    const coords = guessLocation(location || note)
-    const severity = ai
-      ? ai.severity_score >= 7 ? "High" : ai.severity_score >= 4 ? "Medium" : "Low"
-      : "Medium"
+      const coords = guessLocation(location || note)
+      const severity = ai
+        ? ai.severity_score >= 7 ? "High" : ai.severity_score >= 4 ? "Medium" : "Low"
+        : "Medium"
+      const reportLocation = location || "Davis, CA (location not specified)"
 
-    await supabase.from("reports").insert({
-      type: selectedType,
-      location: location || "Davis, CA (location not specified)",
-      latitude: coords.lat,
-      longitude: coords.lng,
-      severity,
-      note: note || null,
-      ai_classification: ai,
-    })
+      const { data, error } = await supabase
+        .from("reports")
+        .insert({
+          user_id: user?.id,
+          type: selectedType,
+          location: reportLocation,
+          latitude: coords.lat,
+          longitude: coords.lng,
+          severity,
+          note: note || null,
+          ai_classification: ai,
+        })
+        .select("location, severity")
+        .single()
 
-    setLoading(false)
-    setSubmitted(true)
+      if (error) throw error
+
+      setSubmittedReport({
+        location: data.location,
+        severity: data.severity,
+      })
+      setSubmitted(true)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Could not submit report."
+      setSubmitError(message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (submitted) {
     return (
-      <div className="flex min-h-screen pb-24 items-center justify-center bg-black p-6 text-white">
-        <div className="max-w-md w-full rounded-3xl bg-zinc-900 p-8 text-center shadow-xl">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/20">
-            <Send className="h-8 w-8 text-green-400" />
+      <div className="app-shell items-center p-6 pb-24">
+        <div className="glass-panel max-w-md w-full rounded-3xl p-8 text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+            <Send className="h-8 w-8 text-green-600" />
           </div>
           <h1 className="text-3xl font-bold">Report submitted</h1>
           <p className="mt-3 text-gray-400">
             Your near-miss report helps make invisible danger patterns visible.
           </p>
+          {submittedReport && (
+            <div className="mt-5 rounded-2xl border border-green-200 bg-green-50 p-4 text-left">
+              <p className="text-xs font-bold uppercase tracking-wide text-green-700">
+                Added to map
+              </p>
+              <p className="mt-1 font-semibold text-zinc-900">{submittedReport.location}</p>
+              <p className="text-sm text-zinc-600">Severity: {submittedReport.severity}</p>
+            </div>
+          )}
 
           {aiResult && (
-            <div className="mt-6 rounded-2xl border border-orange-500/30 bg-orange-500/10 p-5 text-left">
-              <p className="text-sm font-bold text-orange-400 mb-3">🤖 AI Analysis</p>
+            <div className="mt-6 rounded-2xl border border-orange-100 bg-orange-50 p-5 text-left">
+              <p className="text-sm font-bold text-orange-700 mb-3">AI Analysis</p>
               <div className="space-y-2">
                 <p className="text-sm text-gray-300">
-                  <span className="text-white font-semibold">Severity score:</span> {aiResult.severity_score}/10
+                  <span className="text-zinc-900 font-semibold">Severity score:</span> {aiResult.severity_score}/10
                 </p>
                 <p className="text-sm text-gray-300">
-                  <span className="text-white font-semibold">Recommended fix:</span> {aiResult.suggested_fix}
+                  <span className="text-zinc-900 font-semibold">Recommended fix:</span> {aiResult.suggested_fix}
                 </p>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {aiResult.tags?.map((tag: string) => (
@@ -140,7 +175,7 @@ export default function ReportPage() {
             </div>
           )}
 
-          <a href="/map" className="mt-6 inline-block rounded-full bg-white px-6 py-3 font-semibold text-black">
+          <a href="/map" className="primary-action mt-6 inline-block rounded-full px-6 py-3">
             See it on the map
           </a>
         </div>
@@ -150,12 +185,12 @@ export default function ReportPage() {
   }
 
   return (
-    <div className="min-h-screen pb-24 bg-black p-6 text-white">
-      <div className="mx-auto max-w-md">
-        <p className="text-sm uppercase tracking-[0.3em] text-orange-400">BlindSpot</p>
-        <h1 className="mt-3 text-4xl font-bold">Report a near miss</h1>
-        <p className="mt-3 text-gray-400">
-          Tap what happened. Your report gets AI-analyzed and mapped instantly.
+    <div className="app-shell">
+      <div className="mobile-canvas">
+        <p className="eyebrow">BlindSpot</p>
+        <h1 className="display-title text-4xl">Report a near miss</h1>
+        <p className="muted-copy mt-3">
+          Signal what happened. Help fix what repeats.
         </p>
 
         <div className="mt-8 grid grid-cols-2 gap-3">
@@ -163,10 +198,10 @@ export default function ReportPage() {
             <button
               key={label}
               onClick={() => setSelectedType(label)}
-              className={`rounded-2xl border p-4 text-left transition ${
+              className={`rounded-2xl p-4 text-left transition ${
                 selectedType === label
-                  ? "border-orange-400 bg-orange-500/20"
-                  : "border-zinc-800 bg-zinc-900"
+                  ? "border border-orange-300 bg-orange-50 shadow-lg shadow-orange-100"
+                  : "soft-card"
               }`}
             >
               <Icon className="mb-3 h-6 w-6" />
@@ -179,33 +214,39 @@ export default function ReportPage() {
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           placeholder="Where did this happen? (e.g. Russell Blvd)"
-          className="mt-6 w-full rounded-2xl border border-zinc-800 bg-zinc-900 p-4 text-white outline-none placeholder:text-gray-500"
+          className="mt-6 w-full rounded-2xl border border-zinc-300 bg-white/70 p-4 text-zinc-900 outline-none placeholder:text-zinc-500 focus:border-zinc-500"
         />
 
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="Optional: describe what happened..."
-          className="mt-4 min-h-28 w-full rounded-2xl border border-zinc-800 bg-zinc-900 p-4 text-white outline-none placeholder:text-gray-500"
+          className="mt-4 min-h-28 w-full rounded-2xl border border-zinc-300 bg-white/70 p-4 text-zinc-900 outline-none placeholder:text-zinc-500 focus:border-zinc-500"
         />
 
         <button
           onClick={handleSubmit}
           disabled={!selectedType || loading}
-          className="mt-6 w-full rounded-full bg-white px-6 py-4 font-bold text-black disabled:cursor-not-allowed disabled:bg-zinc-700 disabled:text-zinc-400 flex items-center justify-center gap-2"
+          className="primary-action mt-6 flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 disabled:cursor-not-allowed disabled:bg-zinc-700 disabled:text-zinc-400 disabled:shadow-none"
         >
           {loading ? (
             <>
               <Loader2 className="h-5 w-5 animate-spin" />
               Analyzing with AI...
             </>
-          ) : "Submit & Analyze"}
+          ) : "Signal it"}
         </button>
 
         {loading && (
           <p className="mt-3 text-center text-sm text-gray-500">
-            Claude is classifying your report and scoring risk level...
+            Analyzing risk...
           </p>
+        )}
+        {submitError && (
+          <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4">
+            <p className="text-sm font-semibold text-red-700">Report did not save</p>
+            <p className="mt-1 text-sm text-red-600">{submitError}</p>
+          </div>
         )}
       </div>
       <Navbar />

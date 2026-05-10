@@ -25,7 +25,7 @@ export type RealIncident = {
 }
 
 const lrspSourceUrl =
-  "https://documents.cityofdavis.org/Media/Default/Documents/PDF/CityCouncil/Bicycling-Transportation-Street-Safety-Commission/Local%20Road%20Safety%20Plan%202023/Final%20Davis%20LRSP%20Executive%20Summary%20PDF.pdf"
+  "https://www.cityofdavis.org/city-hall/public-works-engineering-and-transportation/transportation"
 
 export const realIncidents: RealIncident[] = [
   {

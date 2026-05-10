@@ -63,10 +63,10 @@ export default function SurveyPage() {
 
   if (step === "done") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-black p-6 text-white pb-24">
-        <div className="max-w-md w-full text-center">
-          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-500/20">
-            <CheckCircle className="h-10 w-10 text-green-400" />
+      <div className="app-shell items-center p-6 pb-24">
+        <div className="glass-panel max-w-md w-full rounded-3xl p-8 text-center">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
+            <CheckCircle className="h-10 w-10 text-green-600" />
           </div>
           <h1 className="text-3xl font-bold">Thank you!</h1>
           <p className="mt-3 text-gray-400">
@@ -75,7 +75,7 @@ export default function SurveyPage() {
           </p>
           <a
             href="/"
-            className="mt-8 inline-block rounded-full bg-white px-8 py-3 font-bold text-black"
+            className="primary-action mt-8 inline-block rounded-full px-8 py-3"
           >
             See the dashboard
           </a>
@@ -86,8 +86,8 @@ export default function SurveyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white flex justify-center">
-      <div className="w-full max-w-md p-6 pb-32">
+    <div className="app-shell">
+      <div className="mobile-canvas pb-32">
 
         {/* Progress */}
         <div className="mb-8 flex gap-2">
@@ -95,9 +95,9 @@ export default function SurveyPage() {
             <div
               key={s}
               className={`h-1.5 flex-1 rounded-full transition-all ${
-                step === s ? "bg-orange-400"
+                step === s ? "bg-orange-500"
                 : ["spots", "incidents", "would_use"].indexOf(step) > i
-                ? "bg-orange-400/50" : "bg-zinc-800"
+                ? "bg-orange-200" : "bg-zinc-200"
               }`}
             />
           ))}
@@ -105,10 +105,10 @@ export default function SurveyPage() {
 
         {step === "spots" && (
           <>
-            <p className="text-sm uppercase tracking-[0.3em] text-orange-400">
+            <p className="eyebrow">
               BlindSpot Survey
             </p>
-            <h1 className="mt-3 text-3xl font-bold">
+            <h1 className="mt-3 text-3xl font-black">
               Where do you feel unsafe biking in Davis?
             </h1>
             <p className="mt-2 text-gray-400">Select all that apply.</p>
@@ -120,18 +120,18 @@ export default function SurveyPage() {
                   onClick={() => toggleSpot(spot)}
                   className={`w-full rounded-2xl border p-4 text-left transition flex items-center justify-between ${
                     selectedSpots.includes(spot)
-                      ? "border-orange-400 bg-orange-500/10"
-                      : "border-zinc-800 bg-zinc-900"
+                      ? "border-orange-300 bg-orange-50"
+                      : "soft-card"
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <MapPin className={`h-4 w-4 shrink-0 ${
-                      selectedSpots.includes(spot) ? "text-orange-400" : "text-zinc-500"
+                      selectedSpots.includes(spot) ? "text-orange-500" : "text-zinc-500"
                     }`} />
                     <span className="text-sm font-medium">{spot}</span>
                   </div>
                   {selectedSpots.includes(spot) && (
-                    <CheckCircle className="h-5 w-5 shrink-0 text-orange-400" />
+                    <CheckCircle className="h-5 w-5 shrink-0 text-orange-500" />
                   )}
                 </button>
               ))}
@@ -140,7 +140,7 @@ export default function SurveyPage() {
             <button
               onClick={() => setStep("incidents")}
               disabled={selectedSpots.length === 0}
-              className="mt-8 w-full rounded-full bg-white py-4 font-bold text-black disabled:bg-zinc-700 disabled:text-zinc-400 flex items-center justify-center gap-2"
+              className="primary-action mt-8 flex w-full items-center justify-center gap-2 rounded-full py-4 disabled:bg-zinc-700 disabled:text-zinc-400 disabled:shadow-none"
             >
               Next <ChevronRight className="h-5 w-5" />
             </button>
@@ -149,10 +149,10 @@ export default function SurveyPage() {
 
         {step === "incidents" && (
           <>
-            <p className="text-sm uppercase tracking-[0.3em] text-orange-400">
+            <p className="eyebrow">
               BlindSpot Survey
             </p>
-            <h1 className="mt-3 text-3xl font-bold">
+            <h1 className="mt-3 text-3xl font-black">
               What have you experienced while biking?
             </h1>
             <p className="mt-2 text-gray-400">Select all that apply.</p>
@@ -164,12 +164,12 @@ export default function SurveyPage() {
                   onClick={() => toggleIncident(inc)}
                   className={`rounded-2xl border p-4 text-left transition ${
                     selectedIncidents.includes(inc)
-                      ? "border-orange-400 bg-orange-500/10"
-                      : "border-zinc-800 bg-zinc-900"
+                      ? "border-orange-300 bg-orange-50"
+                      : "soft-card"
                   }`}
                 >
                   {selectedIncidents.includes(inc) && (
-                    <CheckCircle className="mb-2 h-4 w-4 text-orange-400" />
+                    <CheckCircle className="mb-2 h-4 w-4 text-orange-500" />
                   )}
                   <span className="text-sm font-medium">{inc}</span>
                 </button>
@@ -179,7 +179,7 @@ export default function SurveyPage() {
             <button
               onClick={() => setStep("would_use")}
               disabled={selectedIncidents.length === 0}
-              className="mt-8 w-full rounded-full bg-white py-4 font-bold text-black disabled:bg-zinc-700 disabled:text-zinc-400 flex items-center justify-center gap-2"
+              className="primary-action mt-8 flex w-full items-center justify-center gap-2 rounded-full py-4 disabled:bg-zinc-700 disabled:text-zinc-400 disabled:shadow-none"
             >
               Next <ChevronRight className="h-5 w-5" />
             </button>
@@ -188,10 +188,10 @@ export default function SurveyPage() {
 
         {step === "would_use" && (
           <>
-            <p className="text-sm uppercase tracking-[0.3em] text-orange-400">
+            <p className="eyebrow">
               BlindSpot Survey
             </p>
-            <h1 className="mt-3 text-3xl font-bold">
+            <h1 className="mt-3 text-3xl font-black">
               Would you use an app like BlindSpot?
             </h1>
             <p className="mt-2 text-gray-400">
@@ -209,8 +209,8 @@ export default function SurveyPage() {
                   onClick={() => setWouldUse(value)}
                   className={`w-full rounded-2xl border p-5 text-left transition ${
                     wouldUse === value
-                      ? "border-orange-400 bg-orange-500/10"
-                      : "border-zinc-800 bg-zinc-900"
+                      ? "border-orange-300 bg-orange-50"
+                      : "soft-card"
                   }`}
                 >
                   <p className="font-semibold">{label}</p>
@@ -223,13 +223,13 @@ export default function SurveyPage() {
               value={why}
               onChange={(e) => setWhy(e.target.value)}
               placeholder="Any other thoughts? (optional)"
-              className="mt-6 min-h-24 w-full rounded-2xl border border-zinc-800 bg-zinc-900 p-4 text-white outline-none placeholder:text-gray-500"
+              className="mt-6 min-h-24 w-full rounded-2xl border border-zinc-300 bg-white/70 p-4 text-zinc-900 outline-none placeholder:text-zinc-500 focus:border-zinc-500"
             />
 
             <button
               onClick={handleSubmit}
               disabled={!wouldUse || submitting}
-              className="mt-6 w-full rounded-full bg-white py-4 font-bold text-black disabled:bg-zinc-700 disabled:text-zinc-400 flex items-center justify-center gap-2"
+              className="primary-action mt-6 flex w-full items-center justify-center gap-2 rounded-full py-4 disabled:bg-zinc-700 disabled:text-zinc-400 disabled:shadow-none"
             >
               {submitting ? (
                 <><Loader2 className="h-5 w-5 animate-spin" /> Submitting...</>

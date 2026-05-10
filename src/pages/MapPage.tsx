@@ -31,23 +31,24 @@ function createDangerIcon(severity: string) {
     severity === "Medium" ? "#f97316" : "#22c55e"
 
   const size =
-    severity === "High" ? 36 :
-    severity === "Medium" ? 28 : 22
+    severity === "High" ? 24 :
+    severity === "Medium" ? 20 : 18
 
   const html = `
     <div style="
       width: ${size}px;
       height: ${size}px;
-      background: ${color}22;
+      background: white;
       border: 2px solid ${color};
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
+      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.22);
     ">
       <div style="
-        width: ${size * 0.35}px;
-        height: ${size * 0.35}px;
+        width: ${size * 0.42}px;
+        height: ${size * 0.42}px;
         background: ${color};
         border-radius: 50%;
       "></div>
@@ -92,13 +93,13 @@ export default function MapPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-black flex justify-center">
-      <div className="relative h-screen w-full max-w-md overflow-hidden">
+    <div className="app-shell">
+      <div className="relative h-screen w-full max-w-[430px] overflow-hidden bg-zinc-200">
         <MapContainer className="h-full w-full" center={center} zoom={14}>
           <SetView />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           />
 
           {combinedReports.map((report) => {
@@ -110,12 +111,12 @@ export default function MapPage() {
               <Fragment key={report.id}>
                 <Circle
                   center={[report.latitude, report.longitude]}
-                  radius={report.severity === "High" ? 145 : report.severity === "Medium" ? 105 : 75}
+                  radius={report.severity === "High" ? 90 : report.severity === "Medium" ? 70 : 50}
                   pathOptions={{
                     color: report.severity === "High" ? "#ef4444" : "#f97316",
                     fillColor: report.severity === "High" ? "#ef4444" : "#f97316",
-                    fillOpacity: report.severity === "High" ? 0.18 : 0.11,
-                    opacity: 0.45,
+                    fillOpacity: report.severity === "High" ? 0.08 : 0.06,
+                    opacity: 0.28,
                     weight: 1,
                   }}
                 />
@@ -127,7 +128,7 @@ export default function MapPage() {
                     <div className="min-w-[220px]">
                       <h3 className="text-base font-bold">{report.type}</h3>
                       <p className="mt-1 text-sm text-gray-600">{report.location}</p>
-                      <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-orange-600">
+                      <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-zinc-700">
                         Source: {source}
                       </p>
                       {detail && (
@@ -135,14 +136,14 @@ export default function MapPage() {
                       )}
                       {suggestedFix && (
                         <div className="mt-2 rounded-lg bg-orange-50 p-2">
-                          <p className="text-xs font-bold text-orange-600">Infrastructure Recommendation</p>
+                          <p className="text-xs font-bold text-orange-700">Infrastructure Recommendation</p>
                           <p className="text-xs text-gray-600">{suggestedFix}</p>
                         </div>
                       )}
                       <div className="mt-3 flex items-center justify-between">
                         <span className={`rounded-full px-3 py-1 text-xs font-bold ${
                           report.severity === "High" ? "bg-red-100 text-red-600"
-                          : report.severity === "Medium" ? "bg-yellow-100 text-yellow-700"
+                          : report.severity === "Medium" ? "bg-orange-100 text-orange-700"
                           : "bg-green-100 text-green-700"
                         }`}>
                           {report.severity}
@@ -162,37 +163,36 @@ export default function MapPage() {
             <>
               <Polyline
                 positions={dangerousRoute as [number, number][]}
-                pathOptions={{ color: "red", weight: 5, opacity: 0.5, dashArray: "10" }}
+                pathOptions={{ color: "#ef4444", weight: 5, opacity: 0.5, dashArray: "10" }}
               />
               <Polyline
                 positions={safestRoute as [number, number][]}
-                pathOptions={{ color: "#f97316", weight: 7 }}
+                pathOptions={{ color: "#22c55e", weight: 7 }}
               />
             </>
           )}
         </MapContainer>
 
         {/* Header */}
-        <div className="absolute left-4 right-4 top-4 z-[1000] rounded-3xl bg-black/85 p-4 text-white shadow-xl backdrop-blur">
+        <div className="glass-panel absolute left-4 right-4 top-4 z-[1000] rounded-[1.5rem] p-3 text-zinc-900">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-orange-400" />
-              <h1 className="text-lg font-bold">BlindSpot Safety Map</h1>
+              <AlertTriangle className="h-5 w-5 text-orange-500" />
+              <div>
+                <h1 className="text-base font-black">Safety Map</h1>
+                <p className="text-xs text-zinc-500">See it. Signal it. Fix it.</p>
+              </div>
             </div>
-            <span className="flex items-center gap-1.5 text-xs text-green-400">
-              <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
+            <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-bold text-green-700">
               {combinedReports.length} signals
             </span>
           </div>
-          <p className="mt-1 text-sm text-gray-300">
-            Public crash hotspots plus live community near-misses.
-          </p>
           <div className="mt-3 flex gap-2 text-[11px] font-semibold">
-            <span className="rounded-full bg-red-500/20 px-2 py-1 text-red-300">
-              {realIncidents.length} public hotspots
+            <span className="rounded-full bg-red-100 px-2 py-1 text-red-600">
+              {realIncidents.length} public
             </span>
-            <span className="rounded-full bg-green-500/20 px-2 py-1 text-green-300">
-              {reports.length} community reports
+            <span className="rounded-full bg-green-100 px-2 py-1 text-green-700">
+              {reports.length} community
             </span>
           </div>
         </div>
@@ -200,51 +200,47 @@ export default function MapPage() {
         {/* Safe route button */}
         <button
           onClick={() => setShowSafeRoute(!showSafeRoute)}
-          className="absolute left-4 top-32 z-[1000] rounded-full bg-orange-500 px-5 py-3 font-bold text-black shadow-xl"
+          className="primary-action absolute left-4 top-32 z-[1000] rounded-full px-4 py-2.5 text-sm"
         >
-          {showSafeRoute ? "Hide Safe Route" : "Get Safer Route"}
+          {showSafeRoute ? "Hide route" : "Safer route"}
         </button>
 
         {/* Report FAB */}
         <Link
           to="/report"
-          className="absolute bottom-40 right-5 z-[1000] flex h-16 w-16 items-center justify-center rounded-full bg-orange-500 text-black shadow-2xl"
+          className="primary-action absolute bottom-32 right-5 z-[1000] flex h-14 w-14 items-center justify-center rounded-full"
         >
-          <FileWarning className="h-8 w-8" />
+          <FileWarning className="h-7 w-7" />
         </Link>
 
         {/* Bottom sheet */}
-        <div className="absolute bottom-20 left-0 right-0 z-[1000] rounded-t-3xl bg-black p-5 text-white shadow-2xl">
-          <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-zinc-700" />
+        <div className="glass-panel absolute bottom-20 left-4 right-4 z-[1000] rounded-[1.5rem] p-4 text-zinc-900">
+          <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-zinc-300" />
           <div className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-orange-400" />
-            <h2 className="text-xl font-bold">Nearby Risk Zones</h2>
+            <MapPin className="h-5 w-5 text-orange-500" />
+            <h2 className="text-lg font-black">Risk zones</h2>
           </div>
 
           {showSafeRoute && (
-            <div className="mt-4 rounded-2xl border border-orange-500/30 bg-orange-500/10 p-4">
-              <p className="text-sm font-semibold text-orange-400">Safer Route Found</p>
-              <p className="mt-2 text-sm text-gray-300">
-                This route avoids 3 high-risk intersections and reduces reported
-                danger exposure by 64%.
-              </p>
+            <div className="mt-3 rounded-2xl border border-green-200 bg-green-50 px-3 py-2">
+              <p className="text-sm font-semibold text-green-700">Lower exposure route highlighted.</p>
             </div>
           )}
 
-          <div className="mt-4 space-y-3">
+          <div className="mt-3 space-y-2">
             {combinedReports
               .filter((r) => r.severity === "High")
               .slice(0, 2)
               .map((report) => (
                 <div
                   key={report.id}
-                  className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-900 p-4"
+                  className="flex items-center justify-between border-t border-zinc-200 pt-2"
                 >
                   <div>
-                    <p className="font-semibold">{report.type}</p>
-                    <p className="text-sm text-gray-400">{report.location}</p>
+                    <p className="text-sm font-semibold">{report.location}</p>
+                    <p className="text-xs text-zinc-500">{report.type}</p>
                   </div>
-                  <span className="rounded-full bg-red-500/20 px-3 py-1 text-sm font-semibold text-red-400">
+                  <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-bold text-red-600">
                     {report.severity}
                   </span>
                 </div>
