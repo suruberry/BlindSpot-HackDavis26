@@ -7,6 +7,7 @@ import PlannerPage from "./pages/PlannerPage"
 import SurveyPage from "./pages/SurveyPage"
 import InsightsPage from "./pages/InsightsPage"
 import LoginPage from "./pages/LoginPage"
+import MyReportsPage from "./pages/MyReportsPage"
 
 function ProtectedApp() {
   const { user, loading } = useAuth()
@@ -29,6 +30,7 @@ function ProtectedApp() {
       <Route path="/planner" element={<PlannerPage />} />
       <Route path="/survey" element={<SurveyPage />} />
       <Route path="/insights" element={<InsightsPage />} />
+      <Route path="/my-reports" element={<MyReportsPage />} />
     </Routes>
   )
 }

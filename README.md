@@ -39,6 +39,7 @@ This is not just a map app. It is a community-powered early warning system for c
 - Uses Claude through a Supabase Edge Function to classify reports and suggest infrastructure fixes.
 - Provides a planner mode for asking safety questions about the combined dataset.
 - Uses Supabase Auth and row-level security so reports can be tied to users.
+- Gives each signed-in user a personal report history page.
 - Deploys as a Vercel web app with Supabase for database, auth, realtime, and serverless AI calls.
 
 ---
@@ -78,6 +79,7 @@ The report flow lets users:
 2. Add a location and optional details.
 3. Submit the signal.
 4. See confirmation that the report was saved and added to the map.
+5. Review their own submitted reports from the My Reports page.
 
 ### AI Safety Planner
 

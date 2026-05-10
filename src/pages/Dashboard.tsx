@@ -129,9 +129,14 @@ export default function Dashboard() {
           </Link>
         </section>
 
-        <p className="mt-6 truncate text-center text-xs text-zinc-500">
-          Signed in as {user?.email}
-        </p>
+        <div className="mt-6 text-center">
+          <p className="truncate text-xs text-zinc-500">
+            Signed in as {user?.email}
+          </p>
+          <Link to="/my-reports" className="mt-2 inline-flex text-xs font-bold text-zinc-700 underline">
+            View my reports
+          </Link>
+        </div>
 
         <Navbar />
       </div>
