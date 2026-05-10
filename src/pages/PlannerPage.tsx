@@ -20,6 +20,26 @@ const SUGGESTED_QUESTIONS = [
 
 type PlannerReport = Report | (typeof realIncidents)[number]
 
+function locationName(report: PlannerReport) {
+  return report.location
+}
+
+function fallbackPlannerReply(question: string, reports: PlannerReport[]) {
+  const highRisk = reports.filter((report) => report.severity === "High")
+  const topLocations = highRisk.slice(0, 3).map(locationName)
+  const questionLower = question.toLowerCase()
+
+  if (questionLower.includes("night")) {
+    return `Claude is unavailable right now, so here is a local safety summary.\n\nHighest nighttime concern: poor lighting and visibility appear repeatedly in the survey and safety signals.\n\nRecommended fixes:\n- Add lighting audits around high-traffic crossings.\n- Improve reflective lane markings near reported conflict zones.\n- Prioritize ${topLocations[0] ?? "Russell Blvd"} for visibility review.`
+  }
+
+  if (questionLower.includes("infrastructure") || questionLower.includes("bike lane") || questionLower.includes("improvements")) {
+    return `Claude is unavailable right now, so here is a local safety summary.\n\nPriority infrastructure fixes:\n- Protected bike separation at repeated high-risk corridors.\n- Safer right-turn design at conflict-heavy intersections.\n- Better lighting and pavement visibility.\n\nStart with: ${topLocations.join(", ") || "Russell Blvd, Covell Blvd, and Hutchison Dr"}.`
+  }
+
+  return `Claude is unavailable right now, so here is a local safety summary.\n\nMost urgent high-risk zones:\n${topLocations.map((location, index) => `${index + 1}. ${location}`).join("\n") || "1. Russell Blvd\n2. Covell Blvd\n3. Hutchison Dr"}\n\nThese locations should be reviewed for protected bike space, turn conflict reduction, and clearer cyclist visibility.`
+}
+
 async function askClaude(messages: Message[], reports: PlannerReport[]): Promise<string> {
   const reportSummary = reports.map(r =>
     `- ${r.type} at ${r.location} (Severity: ${r.severity}; Source: ${"source" in r ? r.source : "Community Report"})${"description" in r ? `: "${r.description}"` : r.note ? `: "${r.note}"` : ""}${r.ai_classification ? ` | Infrastructure fix: ${r.ai_classification.suggested_fix}` : ""}`
@@ -44,12 +64,12 @@ Answer questions about this data concisely and actionably. When recommending inf
 
     console.log("Claude response:", data)
 
-    if (error) return `Error: ${error.message}`
-    if (data.error) return `Error: ${data.error.message}`
+    if (error) return fallbackPlannerReply(messages.at(-1)?.content ?? "", reports)
+    if (data?.error) return fallbackPlannerReply(messages.at(-1)?.content ?? "", reports)
     return data.content?.[0]?.text || "Sorry, I couldn't process that."
   } catch (e) {
     console.error("Claude error:", e)
-    return "Network error — check console for details."
+    return fallbackPlannerReply(messages.at(-1)?.content ?? "", reports)
   }
 }
 
@@ -117,7 +137,7 @@ export default function PlannerPage() {
                 <button
                   key={q}
                   onClick={() => sendMessage(q)}
-                  className="soft-card w-full rounded-2xl p-4 text-left text-sm text-gray-300 transition hover:border-zinc-400 hover:bg-white/5"
+                  className="soft-card w-full rounded-2xl p-4 text-left text-sm font-semibold text-zinc-700 transition hover:border-zinc-400 hover:bg-white/80"
                 >
                   <Sparkles className="inline h-3.5 w-3.5 text-orange-500 mr-2" />
                   {q}
@@ -131,7 +151,7 @@ export default function PlannerPage() {
               <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                 msg.role === "user"
                   ? "primary-action font-medium"
-                  : "soft-card text-gray-200"
+                  : "soft-card text-zinc-800"
               }`}>
                 {msg.role === "assistant" && (
                   <div className="flex items-center gap-1.5 mb-2">

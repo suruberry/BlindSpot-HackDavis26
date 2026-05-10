@@ -38,6 +38,27 @@ function guessLocation(text: string): { lat: number; lng: number } {
   }
 }
 
+function fallbackClassification(type: string, note: string) {
+  const lower = `${type} ${note}`.toLowerCase()
+  const isHighRisk = ["speed", "merge", "right", "turn", "dark", "lighting", "blocked"].some((term) =>
+    lower.includes(term)
+  )
+  const isLowRisk = lower.includes("minor") || lower.includes("slow")
+
+  return {
+    incident_type: type,
+    severity_score: isHighRisk ? 7 : isLowRisk ? 3 : 5,
+    tags: [
+      type.toLowerCase().replaceAll(" ", "-"),
+      isHighRisk ? "infrastructure-risk" : "community-signal",
+    ],
+    suggested_fix: isHighRisk
+      ? "Review this location for protected bike separation, turn calming, and clearer cyclist visibility."
+      : "Monitor this location for repeated reports and consider signage or pavement visibility improvements.",
+    confidence: "Medium",
+  }
+}
+
 async function classifyWithClaude(type: string, note: string) {
   try {
     const { data, error } = await supabase.functions.invoke("claude", {
@@ -62,7 +83,7 @@ Return exactly this JSON structure:
       },
     })
 
-    if (error || data.error) {
+    if (error || data?.error) {
       throw new Error(error?.message || data.error.message)
     }
 
@@ -70,7 +91,7 @@ Return exactly this JSON structure:
     return JSON.parse(text.trim())
   } catch (e) {
     console.error("Claude classification failed:", e)
-    return null
+    return fallbackClassification(type, note)
   }
 }
 
