@@ -1,5 +1,6 @@
 import Navbar from "../components/Navbar"
 import { useState } from "react"
+import { Link } from "react-router-dom"
 import { AlertTriangle, Bike, Car, Lightbulb, MapPin, Send, Loader2 } from "lucide-react"
 import { supabase } from "../lib/supabase"
 import { useAuth } from "../lib/auth"
@@ -196,9 +197,9 @@ export default function ReportPage() {
             </div>
           )}
 
-          <a href="/map" className="primary-action mt-6 inline-block rounded-full px-6 py-3">
+          <Link to="/map" className="primary-action mt-6 inline-block rounded-full px-6 py-3">
             See it on the map
-          </a>
+          </Link>
         </div>
         <Navbar />
       </div>
