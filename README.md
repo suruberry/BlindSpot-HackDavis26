@@ -202,4 +202,3 @@ Our vision is to create a scalable safety intelligence platform that helps commu
 *Making invisible danger visible.*
 
 ```
-```
