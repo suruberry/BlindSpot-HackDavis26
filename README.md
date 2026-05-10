@@ -2,11 +2,20 @@
 
 > See it. Signal it. Fix it.
 
-BlindSpot is a community-powered cyclist safety intelligence platform for Davis, California. It combines public crash hotspot context, live community near-miss reports, and AI-generated infrastructure recommendations so dangerous bike corridors can be identified before someone gets hurt.
+BlindSpot is a community-powered cyclist safety intelligence platform for Davis. It combines public crash hotspot context, live community near-miss reports, and AI-generated infrastructure recommendations so dangerous bike corridors can be identified before someone gets hurt.
 
 Cyclist crashes do not happen randomly. They often cluster around the same invisible danger zones: confusing crossings, unsafe merges, poor lighting, right-hook turns, and missing bike protection. BlindSpot makes those patterns visible early enough for riders and planners to act.
 
 **Live demo:** https://blindspot-two.vercel.app/
+
+---
+
+## Project Snapshot
+
+- 44 mapped Davis safety signals
+- Realtime community near-miss reporting
+- AI-generated infrastructure recommendations
+- Authenticated user reports with Supabase Auth and RLS
 
 ---
 
