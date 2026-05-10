@@ -86,18 +86,18 @@ function heatCircleStyle(severity: string) {
   const isMedium = severity === "Medium"
 
   return {
-    radius: isHigh ? 230 : isMedium ? 165 : 110,
+    radius: isHigh ? 300 : isMedium ? 210 : 140,
     color: isHigh ? "#ef4444" : isMedium ? "#f97316" : "#eab308",
     fillColor: isHigh ? "#ef4444" : isMedium ? "#f97316" : "#eab308",
-    fillOpacity: isHigh ? 0.34 : isMedium ? 0.24 : 0.16,
-    opacity: 0.06,
+    fillOpacity: isHigh ? 0.42 : isMedium ? 0.3 : 0.2,
+    opacity: 0.1,
     weight: 1,
   }
 }
 
 export default function MapPage() {
   const [showSafeRoute, setShowSafeRoute] = useState(false)
-  const [mapMode, setMapMode] = useState<"markers" | "heatmap">("markers")
+  const [mapMode, setMapMode] = useState<"markers" | "heatmap">("heatmap")
   const [reports, setReports] = useState<Report[]>([])
   const combinedReports = [...realIncidents, ...reports]
 

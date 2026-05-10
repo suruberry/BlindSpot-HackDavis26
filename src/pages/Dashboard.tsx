@@ -1,12 +1,29 @@
 import { Link } from "react-router-dom"
 import { BarChart3, ChevronRight, MapPin, Sparkles } from "lucide-react"
 import { useEffect, useState } from "react"
+import { Circle, MapContainer, TileLayer } from "react-leaflet"
 import Navbar from "../components/Navbar"
 import BlindSpotLogo from "../components/BlindSpotLogo"
 import { supabase } from "../lib/supabase"
 import type { Report } from "../lib/supabase"
 import { realIncidents } from "../data/realIncidents"
 import { useAuth } from "../lib/auth"
+
+const previewCenter: [number, number] = [38.5449, -121.7405]
+
+function previewCircleStyle(severity: string) {
+  const isHigh = severity === "High"
+  const isMedium = severity === "Medium"
+
+  return {
+    radius: isHigh ? 230 : isMedium ? 160 : 100,
+    color: isHigh ? "#ef4444" : isMedium ? "#f97316" : "#eab308",
+    fillColor: isHigh ? "#ef4444" : isMedium ? "#f97316" : "#eab308",
+    fillOpacity: isHigh ? 0.22 : isMedium ? 0.16 : 0.12,
+    opacity: 0.18,
+    weight: 1,
+  }
+}
 
 export default function Dashboard() {
   const { user, signOut } = useAuth()
@@ -55,11 +72,35 @@ export default function Dashboard() {
         </header>
 
         <section className="mt-7 overflow-hidden rounded-[2rem] bg-white shadow-xl shadow-slate-200">
-          <div className="map-grid relative h-56 p-5">
-            <div className="absolute left-12 top-16 h-20 w-20 rounded-full bg-red-400/35 blur-2xl" />
-            <div className="absolute left-32 top-24 h-16 w-16 rounded-full bg-yellow-300/35 blur-2xl" />
-            <div className="absolute right-20 bottom-16 h-20 w-20 rounded-full bg-orange-300/45 blur-2xl" />
-            <span className="inline-flex rounded-full bg-white px-5 py-3 text-sm font-black text-[#063664] shadow-lg">
+          <div className="relative h-56 overflow-hidden">
+            <MapContainer
+              className="h-full w-full"
+              center={previewCenter}
+              zoom={13}
+              zoomControl={false}
+              dragging={false}
+              scrollWheelZoom={false}
+              doubleClickZoom={false}
+              touchZoom={false}
+              keyboard={false}
+              attributionControl={false}
+            >
+              <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
+              <TileLayer url="https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png" pane="shadowPane" />
+              {combinedReports.slice(0, 18).map((report) => {
+                const style = previewCircleStyle(report.severity)
+                return (
+                  <Circle
+                    key={report.id}
+                    center={[report.latitude, report.longitude]}
+                    radius={style.radius}
+                    pathOptions={style}
+                  />
+                )
+              })}
+            </MapContainer>
+            <div className="pointer-events-none absolute inset-0 bg-white/10" />
+            <span className="absolute left-5 top-5 inline-flex rounded-full bg-white px-5 py-3 text-sm font-black text-[#063664] shadow-lg">
               {highRisk.length} danger zones nearby
             </span>
             <Link
