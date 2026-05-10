@@ -4,9 +4,15 @@
 
 BlindSpot is a community-powered cyclist safety intelligence platform for Davis, California. It combines public crash hotspot context, live community near-miss reports, and AI-generated infrastructure recommendations so dangerous bike corridors can be identified before someone gets hurt.
 
-Cyclist crashes do not happen randomly. They often cluster around the same invisible danger zones: confusing crossings, unsafe merges, poor lighting, fast turns, and missing bike protection. BlindSpot makes those patterns visible.
+Cyclist crashes do not happen randomly. They often cluster around the same invisible danger zones: confusing crossings, unsafe merges, poor lighting, right-hook turns, and missing bike protection. BlindSpot makes those patterns visible early enough for riders and planners to act.
 
 **Live demo:** https://blindspot-two.vercel.app/
+
+---
+
+## One-Line Pitch
+
+BlindSpot turns cyclist near-misses into real-time safety intelligence for bike-heavy cities.
 
 ---
 
@@ -18,13 +24,13 @@ Most city safety systems react after crashes are officially reported. But cyclis
 
 BlindSpot fills that missing layer. Riders can signal a near-miss in seconds, the report appears on a live safety map, and the planner mode helps translate clustered risk into concrete infrastructure fixes.
 
-The core demo story:
+The demo story:
 
 1. Open the safety map and show Davis public hotspots alongside community signals.
-2. Click a risk zone to show severity, source, and an infrastructure recommendation.
+2. Toggle between individual markers and aggregated Risk Zones.
 3. Submit a new near-miss report live.
-4. Watch it feed into the map and planning workflow.
-5. Ask the AI planner which intersections need urgent bike safety improvements.
+4. Watch the report feed into the map, user history, and planning context.
+5. Ask the AI planner which intersections Davis should prioritize first.
 
 This is not just a map app. It is a community-powered early warning system for cyclist safety.
 
@@ -35,9 +41,9 @@ This is not just a map app. It is a community-powered early warning system for c
 - Lets cyclists report near-misses quickly from a mobile-first interface.
 - Displays public Davis safety hotspots and live community reports on one map.
 - Labels each signal by source, such as public safety data or community report.
-- Uses severity markers and radius overlays to make risk zones easy to scan.
+- Supports Markers mode for individual reports and Risk Zones mode for severity-based cluster overlays.
 - Uses Claude through a Supabase Edge Function to classify reports and suggest infrastructure fixes.
-- Provides a planner mode for asking safety questions about the combined dataset.
+- Provides a planner mode grounded in compact live report summaries before asking Claude for recommendations.
 - Uses Supabase Auth and row-level security so reports can be tied to users.
 - Gives each signed-in user a personal report history page.
 - Deploys as a Vercel web app with Supabase for database, auth, realtime, and serverless AI calls.
@@ -68,6 +74,7 @@ Map details include:
 - severity-based markers
 - source labels
 - compact risk zone list
+- Risk Zones mode for aggregated severity circles
 - safer route preview
 - clean mobile-first interface
 
@@ -83,17 +90,30 @@ The report flow lets users:
 
 ### AI Safety Planner
 
-Planner mode uses Claude to reason over the combined safety signals and answer questions like:
+Planner mode summarizes the current data before calling Claude, including total signals, top repeated locations, high-severity count, common incident types, and recent community reports. Claude then reasons over that compact context plus the detailed signal list.
 
-- Which intersections need bike lane improvements most urgently?
-- Where are the highest-risk conflict zones?
+Example questions:
+
+- Which intersections should Davis prioritize first?
 - What infrastructure fixes would reduce cyclist exposure?
+- Where are repeated near-miss patterns emerging?
 
 Claude is called through a Supabase Edge Function, so the Anthropic API key is not shipped to the browser.
 
 ### Home and Insights
 
 The Home screen summarizes the current signal count, high-risk areas, and community reports. The Insights page frames the bigger civic story: near-misses are invisible data, and BlindSpot turns them into usable safety intelligence.
+
+---
+
+## Final Demo Flow
+
+1. Start on Home and point out the Davis safety score, map preview, and tagline: "See it. Signal it. Fix it."
+2. Open Zones and show the difference between individual Markers and aggregated Risk Zones.
+3. Submit a new report from the Report tab.
+4. Open My Reports to show user-scoped reporting with Supabase Auth and RLS.
+5. Open Planner and ask: "Which intersections should Davis prioritize first?"
+6. Close on Insights to show the survey-backed reporting gap: only 1 of 12 respondents said they would report a close call to police or the city.
 
 ---
 
@@ -129,6 +149,8 @@ Claude risk classification
 Supabase PostgreSQL reports table
     ↓
 Realtime map + dashboard updates
+    ↓
+My Reports user history
 
 City of Davis LRSP / SWITRS hotspot context
     ↓
@@ -251,9 +273,24 @@ create table reports (
 - Davis-specific social impact and public safety framing.
 - Live reporting and realtime map updates.
 - Public safety hotspot context blended with community reports.
-- AI classification and infrastructure recommendations.
+- AI classification and planner recommendations grounded in compact data summaries.
 - Secure API architecture using Supabase Edge Functions instead of browser-exposed AI keys.
+- User-scoped report history and delete flow protected by Supabase Auth/RLS.
 - Minimal, mobile-first UI designed around quick reporting.
+
+---
+
+## What We Learned
+
+Building BlindSpot taught us that the hardest part of civic safety technology is not only mapping danger. It is making the signal easy enough for people to contribute.
+
+We learned that near-misses are a valuable missing dataset. Public crash data tells cities where harm has already happened, while community reports can show where harm is about to happen. Combining both layers made the project feel much more credible than either source alone.
+
+We also learned that AI is most useful when it is grounded in structured local context. The Planner became stronger once we summarized the current reports into top intersections, severity counts, incident types, and recent community signals before asking Claude for recommendations.
+
+On the engineering side, we learned to separate demo polish from real architecture. Moving Claude behind Supabase Edge Functions protected the API key, while Supabase Auth and RLS made user reports feel legitimate without adding heavy infrastructure.
+
+The biggest product lesson: reporting has to be extremely fast. If a cyclist would not report a close call today because they do not know how, the interface has to make the safer action obvious in seconds.
 
 ---
 
