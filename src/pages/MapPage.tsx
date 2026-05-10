@@ -67,8 +67,37 @@ function sourceForReport(report: Report) {
   return report.ai_classification ? "Community Report + AI" : "Community Report"
 }
 
+function markerCircleStyle(severity: string) {
+  const isHigh = severity === "High"
+  const isMedium = severity === "Medium"
+
+  return {
+    radius: isHigh ? 70 : isMedium ? 54 : 40,
+    color: isHigh ? "#ef4444" : isMedium ? "#f97316" : "#22c55e",
+    fillColor: isHigh ? "#ef4444" : isMedium ? "#f97316" : "#22c55e",
+    fillOpacity: isHigh ? 0.12 : isMedium ? 0.08 : 0.06,
+    opacity: isHigh ? 0.38 : 0.28,
+    weight: 1,
+  }
+}
+
+function heatCircleStyle(severity: string) {
+  const isHigh = severity === "High"
+  const isMedium = severity === "Medium"
+
+  return {
+    radius: isHigh ? 230 : isMedium ? 165 : 110,
+    color: isHigh ? "#ef4444" : isMedium ? "#f97316" : "#eab308",
+    fillColor: isHigh ? "#ef4444" : isMedium ? "#f97316" : "#eab308",
+    fillOpacity: isHigh ? 0.34 : isMedium ? 0.24 : 0.16,
+    opacity: 0.06,
+    weight: 1,
+  }
+}
+
 export default function MapPage() {
   const [showSafeRoute, setShowSafeRoute] = useState(false)
+  const [mapMode, setMapMode] = useState<"markers" | "heatmap">("markers")
   const [reports, setReports] = useState<Report[]>([])
   const combinedReports = [...realIncidents, ...reports]
 
@@ -111,55 +140,54 @@ export default function MapPage() {
             const source = "source" in report ? report.source : sourceForReport(report)
             const detail = "description" in report ? report.description : report.note
             const suggestedFix = report.ai_classification?.suggested_fix
+            const circleStyle = mapMode === "heatmap"
+              ? heatCircleStyle(report.severity)
+              : markerCircleStyle(report.severity)
 
             return (
               <Fragment key={report.id}>
                 <Circle
                   center={[report.latitude, report.longitude]}
-                  radius={report.severity === "High" ? 70 : report.severity === "Medium" ? 54 : 40}
-                  pathOptions={{
-                    color: report.severity === "High" ? "#ef4444" : "#f97316",
-                    fillColor: report.severity === "High" ? "#ef4444" : "#f97316",
-                    fillOpacity: report.severity === "High" ? 0.12 : 0.08,
-                    opacity: 0.38,
-                    weight: 1,
-                  }}
+                  radius={circleStyle.radius}
+                  pathOptions={circleStyle}
                 />
-                <Marker
-                  position={[report.latitude, report.longitude]}
-                  icon={createDangerIcon(report.severity)}
-                >
-                  <Popup>
-                    <div className="min-w-[220px]">
-                      <h3 className="text-base font-bold">{report.type}</h3>
-                      <p className="mt-1 text-sm text-gray-600">{report.location}</p>
-                      <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-zinc-700">
-                        Source: {source}
-                      </p>
-                      {detail && (
-                        <p className="mt-2 text-sm italic text-gray-500">"{detail}"</p>
-                      )}
-                      {suggestedFix && (
-                        <div className="mt-2 rounded-lg bg-orange-50 p-2">
-                          <p className="text-xs font-bold text-orange-700">Infrastructure Recommendation</p>
-                          <p className="text-xs text-gray-600">{suggestedFix}</p>
+                {mapMode === "markers" && (
+                  <Marker
+                    position={[report.latitude, report.longitude]}
+                    icon={createDangerIcon(report.severity)}
+                  >
+                    <Popup>
+                      <div className="min-w-[220px]">
+                        <h3 className="text-base font-bold">{report.type}</h3>
+                        <p className="mt-1 text-sm text-gray-600">{report.location}</p>
+                        <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-zinc-700">
+                          Source: {source}
+                        </p>
+                        {detail && (
+                          <p className="mt-2 text-sm italic text-gray-500">"{detail}"</p>
+                        )}
+                        {suggestedFix && (
+                          <div className="mt-2 rounded-lg bg-orange-50 p-2">
+                            <p className="text-xs font-bold text-orange-700">Infrastructure Recommendation</p>
+                            <p className="text-xs text-gray-600">{suggestedFix}</p>
+                          </div>
+                        )}
+                        <div className="mt-3 flex items-center justify-between">
+                          <span className={`rounded-full px-3 py-1 text-xs font-bold ${
+                            report.severity === "High" ? "bg-red-100 text-red-600"
+                            : report.severity === "Medium" ? "bg-orange-100 text-orange-700"
+                            : "bg-green-100 text-green-700"
+                          }`}>
+                            {report.severity}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {new Date(report.created_at).toLocaleDateString()}
+                          </span>
                         </div>
-                      )}
-                      <div className="mt-3 flex items-center justify-between">
-                        <span className={`rounded-full px-3 py-1 text-xs font-bold ${
-                          report.severity === "High" ? "bg-red-100 text-red-600"
-                          : report.severity === "Medium" ? "bg-orange-100 text-orange-700"
-                          : "bg-green-100 text-green-700"
-                        }`}>
-                          {report.severity}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          {new Date(report.created_at).toLocaleDateString()}
-                        </span>
                       </div>
-                    </div>
-                  </Popup>
-                </Marker>
+                    </Popup>
+                  </Marker>
+                )}
               </Fragment>
             )
           })}
@@ -208,6 +236,25 @@ export default function MapPage() {
           </div>
         </div>
 
+        <div className="absolute left-5 top-[178px] z-[1000] flex rounded-full bg-white/95 p-1 text-xs font-black text-[#063664] shadow-xl shadow-slate-200">
+          <button
+            onClick={() => setMapMode("markers")}
+            className={`rounded-full px-3 py-2 transition ${
+              mapMode === "markers" ? "bg-[#063664] text-white" : "text-slate-500"
+            }`}
+          >
+            Markers
+          </button>
+          <button
+            onClick={() => setMapMode("heatmap")}
+            className={`rounded-full px-3 py-2 transition ${
+              mapMode === "heatmap" ? "bg-[#ff8a00] text-white" : "text-slate-500"
+            }`}
+          >
+            Heatmap
+          </button>
+        </div>
+
         <button
           onClick={() => setShowSafeRoute(!showSafeRoute)}
           className="primary-action absolute left-5 top-28 z-[1000] rounded-full px-4 py-2.5 text-sm"
@@ -233,7 +280,11 @@ export default function MapPage() {
               {combinedReports.length} reports
             </span>
           </div>
-          <p className="mt-1 text-sm font-semibold text-slate-500">Tap markers for source, severity, and recommendations.</p>
+          <p className="mt-1 text-sm font-semibold text-slate-500">
+            {mapMode === "markers"
+              ? "Tap markers for source, severity, and recommendations."
+              : "Heatmap mode shows larger risk fields where severe reports cluster."}
+          </p>
 
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="rounded-xl bg-[#063664] px-4 py-2 text-sm font-bold text-white">Right Hook</span>
