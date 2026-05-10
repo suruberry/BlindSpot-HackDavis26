@@ -97,7 +97,7 @@ function heatCircleStyle(severity: string) {
 
 export default function MapPage() {
   const [showSafeRoute, setShowSafeRoute] = useState(false)
-  const [mapMode, setMapMode] = useState<"markers" | "heatmap">("heatmap")
+  const [mapMode, setMapMode] = useState<"markers" | "riskZones">("markers")
   const [reports, setReports] = useState<Report[]>([])
   const combinedReports = [...realIncidents, ...reports]
 
@@ -140,7 +140,7 @@ export default function MapPage() {
             const source = "source" in report ? report.source : sourceForReport(report)
             const detail = "description" in report ? report.description : report.note
             const suggestedFix = report.ai_classification?.suggested_fix
-            const circleStyle = mapMode === "heatmap"
+            const circleStyle = mapMode === "riskZones"
               ? heatCircleStyle(report.severity)
               : markerCircleStyle(report.severity)
 
@@ -243,12 +243,12 @@ export default function MapPage() {
             Markers
           </button>
           <button
-            onClick={() => setMapMode("heatmap")}
+            onClick={() => setMapMode("riskZones")}
             className={`rounded-full px-3 py-2 transition ${
-              mapMode === "heatmap" ? "bg-[#ff8a00] text-white" : "text-slate-500"
+              mapMode === "riskZones" ? "bg-[#ff8a00] text-white" : "text-slate-500"
             }`}
           >
-            Heatmap
+            Risk Zones
           </button>
         </div>
 
@@ -280,7 +280,7 @@ export default function MapPage() {
           <p className="mt-1 text-sm font-semibold text-slate-500">
             {mapMode === "markers"
               ? "Tap markers for source, severity, and recommendations."
-              : "Heatmap mode uses map-anchored risk circles that scale as you zoom."}
+              : "Risk Zones aggregate nearby safety signals into severity-based circles."}
           </p>
 
           <div className="mt-4 flex flex-wrap gap-2">
