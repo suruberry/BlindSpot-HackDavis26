@@ -1,73 +1,205 @@
-# React + TypeScript + Vite
+# BlindSpot 🚲
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> Community-powered cyclist safety intelligence for safer cities.
 
-Currently, two official plugins are available:
+BlindSpot transforms cyclist near-misses into real-time safety intelligence — helping riders avoid dangerous areas before accidents happen and giving cities actionable data to improve infrastructure where it matters most.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+**Live Demo:** https://blindspot-two.vercel.app/
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+# The Problem
 
-## Expanding the ESLint configuration
+Cities usually react to cyclist safety issues *after* accidents occur.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+But near-misses are the real warning signs.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Most dangerous intersections already have patterns:
+- unsafe merges
+- poor lighting
+- aggressive turns
+- missing bike lanes
+- confusing crossings
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Yet near-misses rarely get reported because reporting systems are slow, complicated, or inaccessible.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+BlindSpot makes reporting frictionless and turns invisible danger into usable public safety data.
+
+---
+
+# Our Solution
+
+BlindSpot is a real-time cyclist safety platform where users can:
+- report near-misses in seconds
+- visualize dangerous intersections on a live map
+- discover safer routes
+- help cities identify infrastructure problems before crashes happen
+
+Using AI-powered analysis and community reports, BlindSpot creates a live safety layer for cities.
+
+---
+
+# Features
+
+## 🗺️ Live Safety Map
+Interactive map displaying community-reported danger zones across Davis.
+
+- Real-time incident updates
+- Severity-based risk markers
+- Smart incident clustering
+- Mobile-first responsive UI
+
+---
+
+## ⚡ 3-Second Near-Miss Reporting
+Fast and frictionless reporting flow.
+
+Users can:
+1. Select incident type
+2. Add location/details
+3. Submit instantly
+
+Reports immediately appear on the live map.
+
+---
+
+## 🤖 AI Safety Analyst
+AI-powered planner interface for identifying infrastructure risks.
+
+Example prompts:
+- “Which intersections are most dangerous?”
+- “Where should bike lane improvements be prioritized?”
+- “Which areas have the highest nighttime risk?”
+
+The AI analyzes incident trends and generates actionable safety insights.
+
+---
+
+## 🛡️ Safe Route Mode
+Compares dangerous vs safer routes using community-reported hazard zones.
+
+Cyclists can:
+- avoid high-risk intersections
+- reduce exposure to unsafe roads
+- make safer navigation decisions
+
+---
+
+## 📊 Community Insights Dashboard
+Visual dashboard built from collected cyclist safety research and reporting trends.
+
+Highlights:
+- near-miss frequency
+- dangerous infrastructure patterns
+- reporting behavior
+- common incident types
+
+---
+
+# Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React + TypeScript + Vite |
+| Styling | TailwindCSS |
+| Maps | React Leaflet + OpenStreetMap |
+| Database | Supabase PostgreSQL |
+| Realtime | Supabase Realtime |
+| AI | Claude via Supabase Edge Functions |
+| Deployment | Vercel |
+
+---
+
+# Architecture
+
+```text
+User Report
+    ↓
+React Frontend
+    ↓
+Supabase Edge Function
+    ↓
+Claude AI Classification
+    ↓
+Supabase PostgreSQL
+    ↓
+Realtime Map Updates
+````
+
+---
+
+# Local Setup
+
+## Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/blindspot
+cd blindspot
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Install Dependencies
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+npm install
+```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Create Environment Variables
+
+Create a `.env` file:
+
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+---
+
+## Start Development Server
+
+```bash
+npm run dev
+```
+
+---
+
+# Database Schema
+
+```sql
+create table reports (
+  id uuid default gen_random_uuid() primary key,
+  type text not null,
+  location text not null,
+  latitude double precision not null,
+  longitude double precision not null,
+  severity text,
+  note text,
+  ai_analysis jsonb,
+  created_at timestamptz default now()
+);
+```
+
+---
+
+# Vision
+
+BlindSpot is designed for Davis — but every city has dangerous intersections and invisible near-miss patterns.
+
+Our vision is to create a scalable safety intelligence platform that helps communities proactively improve cyclist infrastructure before accidents happen.
+
+---
+
+# Prize Categories
+
+* 🏆 Best Hack for Social Good
+* 🤖 Best AI/ML Hack
+* 🎨 Best UI/UX Design
+* 📊 Best Use of Community Data
+
+---
+
+# Built at HackDavis 2026
+
+*Making invisible danger visible.*
+
+```
 ```
