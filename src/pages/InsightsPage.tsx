@@ -1,4 +1,5 @@
 import Navbar from "../components/Navbar"
+import { Link } from "react-router-dom"
 import { AlertTriangle, Bell, CheckCircle2, Eye, MapPinned, Users } from "lucide-react"
 
 const responses = 12
@@ -176,20 +177,24 @@ export default function InsightsPage() {
   return (
     <div className="app-shell">
       <div className="mobile-canvas pb-32">
-        <p className="eyebrow">User Research</p>
-        <h1 className="display-title text-4xl">Community Insights</h1>
-        <p className="muted-copy mt-3">
-          See it. Signal it. Fix it.
-        </p>
+        <header className="mobile-dark-hero">
+          <p className="eyebrow-pill">User Research</p>
+          <h1 className="mt-7 text-4xl font-black leading-none">Community Insights</h1>
+          <p className="mt-5 text-lg font-semibold text-blue-100">
+            See it. Signal it. Fix it.
+          </p>
+        </header>
 
-        <div className="glass-panel mt-6 rounded-3xl p-5">
+        <div className="-mt-8 rounded-[1.75rem] bg-white p-6 shadow-xl shadow-slate-200">
           <div className="flex items-start gap-3">
-            <Users className="mt-1 h-5 w-5 shrink-0 text-zinc-700" />
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-red-100 text-red-500">
+              <Users className="h-7 w-7" />
+            </span>
             <div>
-              <p className="text-xs font-black uppercase tracking-widest text-zinc-500">
+              <p className="text-xs font-black uppercase tracking-widest text-slate-500">
                 12 Davis cyclist responses
               </p>
-              <p className="mt-2 text-xl font-black leading-snug text-zinc-900">
+              <p className="mt-2 text-xl font-black leading-snug text-[#063664]">
                 The biggest gap is not awareness. It is reporting friction.
               </p>
               <p className="muted-copy mt-2 text-sm">
@@ -199,53 +204,55 @@ export default function InsightsPage() {
           </div>
         </div>
 
-        <section className="mt-8 space-y-4">
+        <section className="mt-7 space-y-5">
           {stats.map((s) => (
-            <div key={s.label} className={`rounded-3xl border p-5 ${s.bg}`}>
+            <div key={s.label} className="rounded-[1.75rem] bg-white p-7 shadow-xl shadow-slate-200">
               <div className="flex items-start gap-4">
-                <s.icon className={`mt-1 h-6 w-6 shrink-0 ${s.color}`} />
+                <span className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${s.bg.split(" ")[0]} ${s.color}`}>
+                  <s.icon className="h-7 w-7" />
+                </span>
                 <div>
-                  <p className={`text-3xl font-black ${s.color}`}>{s.value}</p>
-                  <p className="mt-1 font-bold text-zinc-900">{s.label}</p>
-                  <p className="mt-1 text-sm text-zinc-500">{s.sub}</p>
+                  <p className={`text-5xl font-black leading-none ${s.color}`}>{s.value}</p>
+                  <p className="mt-4 text-xl font-black text-[#063664]">{s.label}</p>
+                  <p className="mt-2 rounded-2xl bg-slate-100 px-4 py-3 text-sm font-bold text-slate-500">{s.sub}</p>
                 </div>
               </div>
             </div>
           ))}
         </section>
 
-        <section className="glass-panel mt-8 rounded-3xl p-5">
+        <section className="mt-7 rounded-[1.75rem] bg-white p-6 shadow-xl shadow-slate-200">
           <div className="mb-5 flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-red-500" />
             <div>
-              <h2 className="text-xl font-black">Reporting Gap</h2>
+              <h2 className="text-xl font-black text-[#063664]">Reporting Gap</h2>
               <p className="text-sm text-zinc-500">Would riders report a close call today?</p>
             </div>
           </div>
           <StackedBar data={reportIntent} />
         </section>
 
-        <section className="soft-card mt-8 rounded-3xl p-5">
+        <section className="mt-7 rounded-[1.75rem] bg-white p-6 shadow-xl shadow-slate-200">
           <div className="mb-5 flex items-center gap-2">
             <MapPinned className="h-5 w-5 text-orange-500" />
             <div>
-              <h2 className="text-xl font-black">Top Infrastructure Issues</h2>
+              <h2 className="text-xl font-black text-[#063664]">Top Infrastructure Issues</h2>
               <p className="text-sm text-zinc-500">What made riders feel unsafe</p>
             </div>
           </div>
           <HorizontalBars data={infraIssues} />
         </section>
 
-        <section className="mt-8">
-          <h2 className="text-2xl font-black">Near-Miss Frequency</h2>
+        <section className="mt-7 rounded-[1.75rem] bg-white p-6 shadow-xl shadow-slate-200">
+          <h2 className="text-2xl font-black text-[#063664]">Near-Miss Frequency</h2>
           <p className="muted-copy mt-1 text-sm">In the last 6 months</p>
           <div className="mt-5">
             <HorizontalBars data={nearMisses} max={4} />
           </div>
         </section>
 
-        <section className="mt-8">
-          <h2 className="text-2xl font-black">Safety Alert Interest</h2>
+        <section className="mt-7 rounded-[1.75rem] bg-white p-6 shadow-xl shadow-slate-200">
+          <h2 className="text-2xl font-black text-[#063664]">Safety Alert Interest</h2>
           <p className="muted-copy mt-1 text-sm">
             Rating for a phone vibration near known hot spots
           </p>
@@ -254,17 +261,17 @@ export default function InsightsPage() {
           </div>
         </section>
 
-        <section className="glass-panel mt-8 rounded-3xl p-5">
-          <h2 className="text-xl font-black">3-Second Tagging</h2>
+        <section className="mt-7 rounded-[1.75rem] bg-white p-6 shadow-xl shadow-slate-200">
+          <h2 className="text-xl font-black text-[#063664]">3-Second Tagging</h2>
           <p className="mb-5 mt-1 text-sm text-zinc-500">
             Would riders tag danger at the end of a ride?
           </p>
           <StackedBar data={tagWillingness} />
         </section>
 
-        <section className="mt-8 grid grid-cols-2 gap-3">
+        <section className="mt-7 grid grid-cols-2 gap-3">
           {bikeFrequency.map((item) => (
-            <div key={item.label} className="soft-card rounded-3xl p-4">
+            <div key={item.label} className="rounded-[1.4rem] bg-white p-4 shadow-lg shadow-slate-200">
               <div className={`mb-4 h-2 w-10 rounded-full ${item.color}`} />
               <p className="text-3xl font-black text-zinc-900">{pct(item.count)}%</p>
               <p className="mt-1 text-sm font-semibold text-zinc-500">{item.label}</p>
@@ -272,7 +279,17 @@ export default function InsightsPage() {
           ))}
         </section>
 
-        <div className="soft-card mt-8 rounded-3xl p-6">
+        <div className="mt-7 rounded-[1.75rem] bg-[#063664] p-6 text-white shadow-xl shadow-slate-200">
+          <h2 className="text-2xl font-black">Help Improve Safety</h2>
+          <p className="mt-4 text-lg font-semibold text-blue-100">
+            Your reports make Davis safer for everyone. Every signal counts.
+          </p>
+          <Link to="/report" className="primary-action mt-6 flex justify-center rounded-2xl px-5 py-4 text-center">
+            Report Your Experience
+          </Link>
+        </div>
+
+        <div className="mt-7 rounded-[1.75rem] bg-white p-6 shadow-xl shadow-slate-200">
           <p className="text-lg font-semibold leading-relaxed text-zinc-700 italic">
             "I wouldn't know how to report a near-miss even if I wanted to."
           </p>

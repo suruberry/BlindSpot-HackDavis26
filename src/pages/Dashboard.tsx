@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { AlertTriangle, Bike, ChevronRight, MapPin, Plus, Route, ShieldCheck } from "lucide-react"
+import { BarChart3, ChevronRight, MapPin, Sparkles } from "lucide-react"
 import { useEffect, useState } from "react"
 import Navbar from "../components/Navbar"
 import BlindSpotLogo from "../components/BlindSpotLogo"
@@ -35,107 +35,103 @@ export default function Dashboard() {
 
   const combinedReports = [...realIncidents, ...reports]
   const highRisk = combinedReports.filter((r) => r.severity === "High")
-  const latestHighRisk = highRisk[0]
+  const recentAlerts = highRisk.slice(0, 2)
 
   return (
     <div className="app-shell">
       <div className="mobile-canvas">
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <BlindSpotLogo className="h-16 w-16 shrink-0" />
+            <BlindSpotLogo className="h-12 w-12 shrink-0 rounded-2xl shadow-lg shadow-slate-200" />
             <div>
-              <p className="eyebrow">BlindSpot</p>
-              <h1 className="text-2xl font-black">Home</h1>
+              <h1 className="text-3xl font-black leading-none text-[#063664]">BlindSpot</h1>
+              <p className="text-sm font-bold text-slate-500">Davis, California</p>
             </div>
           </div>
-          <button onClick={signOut} className="rounded-full bg-white/70 px-4 py-2 text-xs font-bold text-zinc-600">
-            Sign out
-          </button>
+          <div className="text-right">
+            <p className="status-pill px-4 py-1 text-sm">72% Safe</p>
+            <p className="mt-1 text-xs font-bold text-slate-400">Safety Score</p>
+          </div>
         </header>
 
-        <section className="mt-8">
-          <h2 className="text-4xl font-black leading-none">
-            See it. Signal it. Fix it.
-          </h2>
-          <p className="muted-copy mt-4">
-            A simple safety layer for Davis cyclists.
-          </p>
-        </section>
-
-        <section className="mt-7 grid gap-3">
-          <Link to="/map" className="primary-action flex items-center justify-between rounded-[1.75rem] px-5 py-5">
-            <span className="flex items-center gap-3">
-              <MapPin className="h-6 w-6" />
-              View safety map
+        <section className="mt-7 overflow-hidden rounded-[2rem] bg-white shadow-xl shadow-slate-200">
+          <div className="map-grid relative h-56 p-5">
+            <div className="absolute left-12 top-16 h-20 w-20 rounded-full bg-red-400/35 blur-2xl" />
+            <div className="absolute left-32 top-24 h-16 w-16 rounded-full bg-yellow-300/35 blur-2xl" />
+            <div className="absolute right-20 bottom-16 h-20 w-20 rounded-full bg-orange-300/45 blur-2xl" />
+            <span className="inline-flex rounded-full bg-white px-5 py-3 text-sm font-black text-[#063664] shadow-lg">
+              {highRisk.length} danger zones nearby
             </span>
-            <ChevronRight className="h-5 w-5" />
-          </Link>
-          <Link to="/report" className="secondary-action flex items-center justify-between rounded-[1.75rem] px-5 py-5">
-            <span className="flex items-center gap-3">
-              <Plus className="h-6 w-6" />
-              Report a near miss
-            </span>
-            <ChevronRight className="h-5 w-5" />
-          </Link>
-        </section>
-
-        <section className="mt-7 grid grid-cols-3 gap-3">
-          <div className="soft-card rounded-3xl p-4">
-            <AlertTriangle className="h-5 w-5 text-orange-500" />
-            <p className="mt-4 text-2xl font-black">{combinedReports.length}</p>
-            <p className="text-xs text-zinc-500">Signals</p>
+            <Link
+              to="/map"
+              className="primary-action absolute bottom-6 right-6 flex h-16 w-16 items-center justify-center rounded-full"
+            >
+              <MapPin className="h-8 w-8" />
+            </Link>
           </div>
-          <div className="soft-card rounded-3xl p-4">
-            <ShieldCheck className="h-5 w-5 text-red-500" />
-            <p className="mt-4 text-2xl font-black">{highRisk.length}</p>
-            <p className="text-xs text-zinc-500">High risk</p>
-          </div>
-          <div className="soft-card rounded-3xl p-4">
-            <Bike className="h-5 w-5 text-green-600" />
-            <p className="mt-4 text-2xl font-black">{reports.length}</p>
-            <p className="text-xs text-zinc-500">Community</p>
-          </div>
-        </section>
-
-        {latestHighRisk && (
-          <section className="glass-panel mt-7 rounded-[1.75rem] p-5">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-red-500">Watch this zone</p>
-                <h3 className="mt-2 text-xl font-black">{latestHighRisk.location}</h3>
-                <p className="muted-copy mt-2 text-sm">{latestHighRisk.type}</p>
-              </div>
-              <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-600">
-                High
-              </span>
+          <Link to="/map" className="flex items-center justify-between bg-[#063664] px-6 py-6 text-white">
+            <div>
+              <h2 className="text-2xl font-black">Safety Zone Map</h2>
+              <p className="mt-1 text-lg text-blue-100">Review hazards before you ride</p>
             </div>
-          </section>
-        )}
-
-        <section className="mt-7 space-y-3">
-          <Link to="/planner" className="soft-card flex items-center justify-between rounded-3xl p-5">
-            <span className="flex items-center gap-3">
-              <Route className="h-5 w-5 text-orange-500" />
-              Ask the AI safety analyst
-            </span>
-            <ChevronRight className="h-5 w-5 text-zinc-400" />
-          </Link>
-          <Link to="/insights" className="soft-card flex items-center justify-between rounded-3xl p-5">
-            <span className="flex items-center gap-3">
-              <AlertTriangle className="h-5 w-5 text-red-500" />
-              View community insights
-            </span>
-            <ChevronRight className="h-5 w-5 text-zinc-400" />
+            <ChevronRight className="h-6 w-6" />
           </Link>
         </section>
 
-        <div className="mt-6 text-center">
-          <p className="truncate text-xs text-zinc-500">
+        <section className="mt-5 grid grid-cols-2 gap-4">
+          <Link to="/insights" className="overflow-hidden rounded-[1.75rem] bg-white shadow-xl shadow-slate-200">
+            <div className="flex h-24 items-end justify-center gap-2 bg-sky-100 pb-5 text-[#7890aa]">
+              <BarChart3 className="h-16 w-16" />
+            </div>
+            <div className="p-5">
+              <h3 className="text-xl font-black text-[#063664]">Insights</h3>
+              <p className="text-sm font-bold text-slate-500">Community data</p>
+            </div>
+          </Link>
+          <Link to="/planner" className="overflow-hidden rounded-[1.75rem] bg-white shadow-xl shadow-slate-200">
+            <div className="flex h-24 items-center justify-end bg-orange-100 pr-6 text-[#ff8a00]">
+              <Sparkles className="h-12 w-12" />
+            </div>
+            <div className="p-5">
+              <h3 className="text-xl font-black text-[#063664]">AI Planner</h3>
+              <p className="text-sm font-bold text-slate-500">Ask questions</p>
+            </div>
+          </Link>
+        </section>
+
+        <section className="mt-7">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-2xl font-black text-slate-700">Recent Alerts</h2>
+            <Link to="/map" className="text-sm font-black text-slate-500">See All</Link>
+          </div>
+          <div className="space-y-4">
+            {recentAlerts.map((alert, index) => (
+              <Link key={alert.id} to="/map" className="block overflow-hidden rounded-[1.75rem] bg-white shadow-xl shadow-slate-200">
+                <div className="road-art relative h-32">
+                  <span className="absolute left-5 top-5 rounded-full bg-white px-4 py-2 text-sm font-black text-[#063664] shadow-md">
+                    {index === 0 ? combinedReports.length : Math.max(1, highRisk.length)} reports
+                  </span>
+                  <span className="absolute right-5 top-5 rounded-full bg-red-500 px-4 py-2 text-sm font-black text-white">
+                    HIGH
+                  </span>
+                </div>
+                <div className="p-5">
+                  <h3 className="text-xl font-black text-[#063664]">{alert.location}</h3>
+                  <p className="mt-2 text-sm font-semibold text-slate-500">{alert.type}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <div className="mt-6 text-center text-xs font-bold text-slate-500">
+          <p className="truncate">
             Signed in as {user?.email}
           </p>
-          <Link to="/my-reports" className="mt-2 inline-flex text-xs font-bold text-zinc-700 underline">
+          <Link to="/my-reports" className="mt-2 inline-flex text-[#ff8a00] underline">
             View my reports
           </Link>
+          <button onClick={signOut} className="ml-4 underline">Sign out</button>
         </div>
 
         <Navbar />

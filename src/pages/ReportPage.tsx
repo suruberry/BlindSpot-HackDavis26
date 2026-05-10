@@ -158,12 +158,12 @@ export default function ReportPage() {
   if (submitted) {
     return (
       <div className="app-shell items-center p-6 pb-24">
-        <div className="glass-panel max-w-md w-full rounded-3xl p-8 text-center">
+        <div className="max-w-md w-full rounded-[2rem] bg-white p-8 text-center shadow-2xl shadow-slate-300">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
             <Send className="h-8 w-8 text-green-600" />
           </div>
           <h1 className="text-3xl font-bold">Report submitted</h1>
-          <p className="mt-3 text-gray-400">
+          <p className="mt-3 text-slate-500">
             Your near-miss report helps make invisible danger patterns visible.
           </p>
           {submittedReport && (
@@ -180,10 +180,10 @@ export default function ReportPage() {
             <div className="mt-6 rounded-2xl border border-orange-100 bg-orange-50 p-5 text-left">
               <p className="text-sm font-bold text-orange-700 mb-3">AI Analysis</p>
               <div className="space-y-2">
-                <p className="text-sm text-gray-300">
+                <p className="text-sm text-slate-700">
                   <span className="text-zinc-900 font-semibold">Severity score:</span> {aiResult.severity_score}/10
                 </p>
-                <p className="text-sm text-gray-300">
+                <p className="text-sm text-slate-700">
                   <span className="text-zinc-900 font-semibold">Recommended fix:</span> {aiResult.suggested_fix}
                 </p>
                 <div className="flex flex-wrap gap-2 mt-2">
@@ -208,48 +208,61 @@ export default function ReportPage() {
 
   return (
     <div className="app-shell">
-      <div className="mobile-canvas">
-        <p className="eyebrow">BlindSpot</p>
-        <h1 className="display-title text-4xl">Report a near miss</h1>
-        <p className="muted-copy mt-3">
-          Signal what happened. Help fix what repeats.
-        </p>
+      <div className="mobile-canvas !px-0 !pt-0">
+        <header className="bg-[#063664] px-7 pb-10 pt-24 text-white">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-9 w-9 text-[#ff8a00]" />
+            <h1 className="text-3xl font-black">Report an Incident</h1>
+          </div>
+          <p className="mt-4 text-lg font-semibold text-blue-100">
+            Help us map safety hazards in Davis
+          </p>
+        </header>
 
-        <div className="mt-8 grid grid-cols-2 gap-3">
+        <main className="px-7 pt-8">
+        <h2 className="text-2xl font-black text-[#063664]">Select Incident Type</h2>
+        <div className="mt-6 grid grid-cols-2 gap-4">
           {incidentTypes.map(({ label, icon: Icon }) => (
             <button
               key={label}
               onClick={() => setSelectedType(label)}
-              className={`rounded-2xl p-4 text-left transition ${
+              className={`flex min-h-32 flex-col items-center justify-center rounded-[1.35rem] border-2 p-4 text-center transition ${
                 selectedType === label
-                  ? "border border-orange-300 bg-orange-50 shadow-lg shadow-orange-100"
-                  : "soft-card"
+                  ? "border-[#ff8a00] bg-orange-50 text-[#063664] shadow-lg shadow-orange-100"
+                  : "border-slate-200 bg-white text-slate-700"
               }`}
             >
-              <Icon className="mb-3 h-6 w-6" />
-              <span className="font-semibold">{label}</span>
+              <Icon className="mb-5 h-9 w-9" />
+              <span className="text-base font-black">{label}</span>
             </button>
           ))}
         </div>
 
+        <h2 className="mt-8 text-2xl font-black text-[#063664]">Location</h2>
         <input
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           placeholder="Where did this happen? (e.g. Russell Blvd)"
-          className="mt-6 w-full rounded-2xl border border-zinc-300 bg-white/70 p-4 text-zinc-900 outline-none placeholder:text-zinc-500 focus:border-zinc-500"
+          className="mt-4 w-full rounded-[1.35rem] border-2 border-slate-200 bg-white p-4 text-zinc-900 outline-none placeholder:text-slate-400 focus:border-[#ff8a00]"
         />
 
+        <h2 className="mt-8 text-2xl font-black text-[#063664]">Additional Details (Optional)</h2>
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          placeholder="Optional: describe what happened..."
-          className="mt-4 min-h-28 w-full rounded-2xl border border-zinc-300 bg-white/70 p-4 text-zinc-900 outline-none placeholder:text-zinc-500 focus:border-zinc-500"
+          placeholder="Describe what happened..."
+          className="mt-4 min-h-36 w-full rounded-[1.35rem] border-2 border-slate-200 bg-white p-4 text-zinc-900 outline-none placeholder:text-slate-400 focus:border-[#ff8a00]"
         />
+
+        <div className="mt-6 rounded-[1.35rem] border border-sky-200 bg-sky-50 p-4">
+          <p className="font-black text-[#063664]">Using your entered location</p>
+          <p className="mt-1 text-sm font-semibold text-slate-600">BlindSpot maps the report to a nearby Davis corridor.</p>
+        </div>
 
         <button
           onClick={handleSubmit}
           disabled={!selectedType || loading}
-          className="primary-action mt-6 flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 disabled:cursor-not-allowed disabled:bg-zinc-700 disabled:text-zinc-400 disabled:shadow-none"
+          className="primary-action mt-6 flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
         >
           {loading ? (
             <>
@@ -270,6 +283,7 @@ export default function ReportPage() {
             <p className="mt-1 text-sm text-red-600">{submitError}</p>
           </div>
         )}
+        </main>
       </div>
       <Navbar />
     </div>

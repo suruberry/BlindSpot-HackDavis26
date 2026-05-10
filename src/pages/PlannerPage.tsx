@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { Building2, Send, Loader2, Sparkles } from "lucide-react"
+import { AlertTriangle, Lightbulb, Loader2, MapPin, Send, Sparkles, TrendingUp } from "lucide-react"
 import Navbar from "../components/Navbar"
 import { supabase } from "../lib/supabase"
 import type { Report } from "../lib/supabase"
@@ -17,6 +17,8 @@ const SUGGESTED_QUESTIONS = [
   "What are the most common types of near-misses in Davis?",
   "Which areas are dangerous at night?",
 ]
+
+const questionIcons = [MapPin, AlertTriangle, TrendingUp, Lightbulb, Sparkles]
 
 type PlannerReport = Report | (typeof realIncidents)[number]
 
@@ -110,39 +112,53 @@ export default function PlannerPage() {
 
   return (
     <div className="app-shell">
-      <div className="flex h-screen w-full max-w-[430px] flex-col pb-20">
+      <div className="flex h-screen w-full max-w-[430px] flex-col bg-[#f5f7fb] pb-20">
 
-        <div className="glass-panel m-4 mb-0 shrink-0 rounded-3xl p-5">
-          <div className="flex items-center gap-2">
-            <Building2 className="h-6 w-6 text-orange-500" />
-            <p className="eyebrow">City Planner Mode</p>
+        <div className="shrink-0 bg-[#063664] px-7 pb-10 pt-24 text-white">
+          <div className="eyebrow-pill gap-2">
+            <Sparkles className="h-4 w-4" />
+            City Planner Mode
           </div>
-          <h1 className="mt-2 text-3xl font-black">AI Safety Analyst</h1>
-          <p className="muted-copy mt-1 text-sm">
+          <h1 className="mt-6 text-4xl font-black leading-none">AI Safety Analyst</h1>
+          <p className="mt-5 text-lg font-semibold text-blue-100">
             Turn safety signals into fixes.
           </p>
           {!loadingReports && (
-            <div className="mt-3 flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-xs text-green-600">{combinedReports.length} safety signals loaded</span>
+            <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-green-500 px-4 py-2">
+              <span className="h-2.5 w-2.5 rounded-full bg-green-100 animate-pulse" />
+              <span className="text-sm font-black">{combinedReports.length} safety signals loaded</span>
             </div>
           )}
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto px-7 py-8 space-y-5">
           {messages.length === 0 && !loadingReports && (
-            <div className="space-y-3">
-              <p className="text-sm text-gray-500 text-center">Suggested questions:</p>
-              {SUGGESTED_QUESTIONS.map((q) => (
+            <div className="space-y-4">
+              <p className="text-lg font-black text-slate-600">Suggested questions:</p>
+              {SUGGESTED_QUESTIONS.slice(0, 4).map((q, index) => {
+                const Icon = questionIcons[index]
+                return (
                 <button
                   key={q}
                   onClick={() => sendMessage(q)}
-                  className="soft-card w-full rounded-2xl p-4 text-left text-sm font-semibold text-zinc-700 transition hover:border-zinc-400 hover:bg-white/80"
+                  className="flex w-full items-center gap-4 rounded-[1.35rem] bg-white p-5 text-left text-base font-black leading-snug text-slate-700 shadow-lg shadow-slate-200 transition hover:-translate-y-0.5"
                 >
-                  <Sparkles className="inline h-3.5 w-3.5 text-orange-500 mr-2" />
-                  {q}
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-sky-100 text-[#ff4b3e]">
+                    <Icon className="h-6 w-6" />
+                  </span>
+                  <span>{q}</span>
                 </button>
-              ))}
+              )})}
+
+              <div className="mt-8 rounded-[1.4rem] bg-[#ff8a00] p-5 text-white shadow-xl shadow-orange-200">
+                <p className="flex items-center gap-2 text-xl font-black">
+                  <Sparkles className="h-6 w-6" />
+                  How It Works
+                </p>
+                <p className="mt-2 text-sm font-semibold text-orange-50">
+                  Ask about danger zones, infrastructure fixes, and patterns across public hotspots plus live reports.
+                </p>
+              </div>
             </div>
           )}
 
@@ -150,8 +166,8 @@ export default function PlannerPage() {
             <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
               <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                 msg.role === "user"
-                  ? "primary-action font-medium"
-                  : "soft-card text-zinc-800"
+                  ? "bg-[#063664] text-white font-bold shadow-lg shadow-slate-200"
+                  : "bg-white text-slate-800 shadow-lg shadow-slate-200"
               }`}>
                 {msg.role === "assistant" && (
                   <div className="flex items-center gap-1.5 mb-2">
@@ -166,7 +182,7 @@ export default function PlannerPage() {
 
           {loading && (
             <div className="flex justify-start">
-              <div className="soft-card rounded-2xl px-4 py-3">
+              <div className="rounded-2xl bg-white px-4 py-3 shadow-lg shadow-slate-200">
                 <div className="flex items-center gap-2 text-orange-600">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   <span className="text-xs">Analyzing {combinedReports.length} signals...</span>
@@ -185,7 +201,7 @@ export default function PlannerPage() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && sendMessage(input)}
               placeholder="Ask about cyclist safety in Davis..."
-              className="flex-1 rounded-2xl border border-zinc-300 bg-white/70 px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-500 focus:border-zinc-500"
+              className="flex-1 rounded-2xl border-2 border-slate-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-slate-400 focus:border-[#ff8a00]"
             />
             <button
               onClick={() => sendMessage(input)}

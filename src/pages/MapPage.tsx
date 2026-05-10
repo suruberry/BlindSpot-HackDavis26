@@ -10,7 +10,7 @@ import {
   Circle,
 } from "react-leaflet"
 import L from "leaflet"
-import { AlertTriangle, FileWarning, MapPin } from "lucide-react"
+import { AlertTriangle, FileWarning } from "lucide-react"
 import Navbar from "../components/Navbar"
 import { supabase } from "../lib/supabase"
 import type { Report } from "../lib/supabase"
@@ -94,7 +94,7 @@ export default function MapPage() {
 
   return (
     <div className="app-shell">
-      <div className="relative h-screen w-full max-w-[430px] overflow-hidden bg-zinc-200">
+      <div className="relative h-screen w-full max-w-[430px] overflow-hidden bg-[#f6f8fb]">
         <MapContainer className="h-full w-full" center={center} zoom={14}>
           <SetView />
           <TileLayer
@@ -173,34 +173,41 @@ export default function MapPage() {
           )}
         </MapContainer>
 
-        {/* Header */}
-        <div className="glass-panel absolute left-4 right-4 top-4 z-[1000] rounded-[1.5rem] p-3 text-zinc-900">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-orange-500" />
-              <div>
-                <h1 className="text-base font-black">Safety Map</h1>
-                <p className="text-xs text-zinc-500">See it. Signal it. Fix it.</p>
-              </div>
+        <div className="pointer-events-none absolute inset-0 z-[900] bg-white/55 backdrop-blur-[1px]" />
+        <div className="pointer-events-none absolute left-4 top-52 z-[950] h-36 w-36 rounded-full bg-red-500/35 blur-3xl" />
+        <div className="pointer-events-none absolute right-0 top-72 z-[950] h-32 w-32 rounded-full bg-orange-400/35 blur-3xl" />
+        <div className="pointer-events-none absolute left-16 bottom-72 z-[950] h-28 w-28 rounded-full bg-yellow-300/35 blur-3xl" />
+
+        <div className="absolute left-7 right-7 top-20 z-[1000] rounded-[1.65rem] bg-red-500 px-5 py-5 text-white shadow-xl shadow-red-200">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-7 w-7 shrink-0" />
+            <div>
+              <h1 className="text-lg font-black">High Right-Hook Risk Zone</h1>
+              <p className="mt-1 text-sm font-semibold text-red-50">
+                {combinedReports.length} incidents across Davis signals
+              </p>
             </div>
-            <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-bold text-green-700">
-              {combinedReports.length} signals
-            </span>
-          </div>
-          <div className="mt-3 flex gap-2 text-[11px] font-semibold">
-            <span className="rounded-full bg-red-100 px-2 py-1 text-red-600">
-              {realIncidents.length} public
-            </span>
-            <span className="rounded-full bg-green-100 px-2 py-1 text-green-700">
-              {reports.length} community
-            </span>
           </div>
         </div>
 
-        {/* Safe route button */}
+        <div className="absolute right-7 top-48 z-[1000] rounded-[1.5rem] bg-white p-5 text-[#063664] shadow-xl shadow-slate-200">
+          <p className="mb-3 text-sm font-black">Danger Levels</p>
+          <div className="space-y-2 text-sm font-semibold text-slate-700">
+            <div className="flex items-center gap-2">
+              <span className="h-4 w-4 rounded-full bg-red-500" /> High
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="h-4 w-4 rounded-full bg-orange-500" /> Medium
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="h-4 w-4 rounded-full bg-yellow-400" /> Low
+            </div>
+          </div>
+        </div>
+
         <button
           onClick={() => setShowSafeRoute(!showSafeRoute)}
-          className="primary-action absolute left-4 top-32 z-[1000] rounded-full px-4 py-2.5 text-sm"
+          className="primary-action absolute left-7 top-44 z-[1000] rounded-full px-5 py-3 text-sm"
         >
           {showSafeRoute ? "Hide route" : "Safer route"}
         </button>
@@ -208,39 +215,50 @@ export default function MapPage() {
         {/* Report FAB */}
         <Link
           to="/report"
-          className="primary-action absolute bottom-32 right-5 z-[1000] flex h-14 w-14 items-center justify-center rounded-full"
+          className="primary-action absolute bottom-56 right-7 z-[1000] flex h-14 w-14 items-center justify-center rounded-full"
         >
           <FileWarning className="h-7 w-7" />
         </Link>
 
-        {/* Bottom sheet */}
-        <div className="glass-panel absolute bottom-20 left-4 right-4 z-[1000] rounded-[1.5rem] p-4 text-zinc-900">
-          <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-zinc-300" />
-          <div className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-orange-500" />
-            <h2 className="text-lg font-black">Risk zones</h2>
+        <div className="absolute bottom-20 left-0 right-0 z-[1000] rounded-t-[2.25rem] bg-white px-7 pb-8 pt-5 text-[#063664] shadow-2xl shadow-slate-300">
+          <div className="mx-auto mb-5 h-1 w-12 rounded-full bg-slate-300" />
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-2xl font-black">
+              {highRiskLocation(combinedReports)}
+            </h2>
+            <span className="rounded-full bg-red-100 px-3 py-1 text-sm font-black text-red-600">
+              {combinedReports.length} reports
+            </span>
+          </div>
+          <p className="mt-2 font-semibold text-slate-500">Last reported from live community signals</p>
+
+          <div className="mt-5 flex flex-wrap gap-2">
+            <span className="rounded-xl bg-[#063664] px-4 py-2 text-sm font-bold text-white">Right Hook</span>
+            <span className="rounded-xl bg-[#063664] px-4 py-2 text-sm font-bold text-white">Close Pass</span>
+            <span className="rounded-xl bg-[#063664] px-4 py-2 text-sm font-bold text-white">Poor Lighting</span>
           </div>
 
           {showSafeRoute && (
-            <div className="mt-3 rounded-2xl border border-green-200 bg-green-50 px-3 py-2">
-              <p className="text-sm font-semibold text-green-700">Lower exposure route highlighted.</p>
+            <div className="mt-5 rounded-2xl border border-orange-300 bg-orange-50 px-4 py-3">
+              <p className="text-sm font-black text-[#063664]">Safety Tip</p>
+              <p className="mt-1 text-sm font-semibold text-slate-600">Lower exposure route highlighted. Review hazard zones before you ride.</p>
             </div>
           )}
 
-          <div className="mt-3 space-y-2">
+          <div className="mt-5 space-y-2">
             {combinedReports
               .filter((r) => r.severity === "High")
               .slice(0, 2)
               .map((report) => (
                 <div
                   key={report.id}
-                  className="flex items-center justify-between border-t border-zinc-200 pt-2"
+                  className="flex items-center justify-between border-t border-slate-100 pt-3"
                 >
                   <div>
-                    <p className="text-sm font-semibold">{report.location}</p>
-                    <p className="text-xs text-zinc-500">{report.type}</p>
+                    <p className="text-sm font-black">{report.location}</p>
+                    <p className="text-xs font-semibold text-slate-500">{report.type}</p>
                   </div>
-                  <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-bold text-red-600">
+                  <span className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-black text-red-600">
                     {report.severity}
                   </span>
                 </div>
@@ -252,4 +270,8 @@ export default function MapPage() {
       </div>
     </div>
   )
+}
+
+function highRiskLocation(reports: Array<Report | (typeof realIncidents)[number]>) {
+  return reports.find((report) => report.severity === "High")?.location ?? "Hutchison Dr & Covell Blvd"
 }
